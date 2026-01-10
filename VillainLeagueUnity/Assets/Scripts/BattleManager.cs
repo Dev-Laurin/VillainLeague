@@ -28,6 +28,7 @@ public class BattleManager : MonoBehaviour
     [Header("References")]
     public BattleUI battleUI;
     public TurnManager turnManager;
+    public BattleBanter battleBanter;
 
     private BattleState currentState;
     private BattleAction selectedAction;
@@ -69,6 +70,12 @@ public class BattleManager : MonoBehaviour
         allCharacters.AddRange(playerSquad);
         allCharacters.AddRange(enemySquad);
         turnManager.InitializeTurnOrder(allCharacters);
+        
+        // Initialize battle banter system
+        if (battleBanter != null)
+        {
+            battleBanter.Initialize(battleUI);
+        }
 
         // Update UI
         UpdateAllUI();
@@ -390,6 +397,31 @@ public class BattleManager : MonoBehaviour
                 battleUI.ShowMessage($"{caster.characterName} gains {styleGained} {caster.secondaryResource.resourceName}!");
                 UpdateAllUI();
                 yield return new WaitForSeconds(0.8f);
+            }
+        }
+        
+        // Trigger battle banter (only for player characters)
+        if (caster.isPlayerCharacter && battleBanter != null)
+        {
+            // Get the other player character
+            Character partner = null;
+            foreach (Character hero in playerSquad)
+            {
+                if (hero != caster && hero.IsAlive())
+                {
+                    partner = hero;
+                    break;
+                }
+            }
+            
+            if (partner != null)
+            {
+                // Randomly choose context for banter
+                string[] contexts = { "move_comment", "playful_insult", "check_in" };
+                int contextIndex = Random.Range(0, contexts.Length);
+                string context = contexts[contextIndex];
+                
+                yield return StartCoroutine(battleBanter.TryTriggerBanter(caster, partner, context));
             }
         }
         

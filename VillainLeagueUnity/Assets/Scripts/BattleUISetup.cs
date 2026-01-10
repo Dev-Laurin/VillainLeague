@@ -65,12 +65,19 @@ public class BattleUISetup : MonoBehaviour
 
         // Setup Target Selection Panel (Center, hidden initially)
         SetupTargetSelectionPanel(canvas.transform);
+        
+        // Setup Banter Dialogue Panel (Bottom Center, hidden initially)
+        SetupBanterDialoguePanel(canvas.transform);
 
         // Wire up BattleUI to BattleManager
         BattleManager battleManager = FindObjectOfType<BattleManager>();
         if (battleManager != null)
         {
             battleManager.battleUI = battleUI;
+            
+            // Create and wire up BattleBanter component
+            BattleBanter battleBanter = battleManager.gameObject.AddComponent<BattleBanter>();
+            battleManager.battleBanter = battleBanter;
         }
 
         Debug.Log("Battle UI setup complete!");
@@ -215,6 +222,29 @@ public class BattleUISetup : MonoBehaviour
         
         battleUI.target2Button = CreateButton("Target2Button", targetPanel.transform, 
             new Vector2(0, -90), new Vector2(400, 70), "Target 2", OnTargetButtonSetup);
+    }
+    
+    void SetupBanterDialoguePanel(Transform parent)
+    {
+        // Banter Dialogue Panel (bottom center, initially hidden)
+        GameObject banterPanel = CreatePanel("BanterDialoguePanel", parent, new Vector2(0, -350), new Vector2(700, 120));
+        banterPanel.SetActive(false);
+        battleUI.banterDialoguePanel = banterPanel;
+        
+        // Change panel color to be more distinct (darker with slight transparency)
+        Image panelImage = banterPanel.GetComponent<Image>();
+        if (panelImage != null)
+        {
+            panelImage.color = new Color(0.15f, 0.15f, 0.2f, 0.9f);
+        }
+        
+        // Banter text
+        battleUI.banterDialogueText = CreateText("BanterText", banterPanel.transform, 
+            new Vector2(0, 0), new Vector2(680, 100), 
+            "", 22, TextAlignmentOptions.Center);
+        
+        // Add slight yellow tint to banter text to make it stand out
+        battleUI.banterDialogueText.color = new Color(1f, 1f, 0.8f);
     }
 
     // Helper methods to create UI elements
