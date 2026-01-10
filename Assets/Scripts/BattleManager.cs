@@ -169,15 +169,17 @@ public class BattleManager : MonoBehaviour
             {
                 if (selectedAction == BattleAction.ATTACK)
                 {
-                    int damage = player.attack;
-                    selectedTarget.TakeDamage(damage);
-                    battleUI.ShowMessage($"{player.characterName} attacks {selectedTarget.characterName} for {damage} damage!");
+                    int attackValue = player.attack;
+                    int actualDamage = Mathf.Max(1, attackValue - selectedTarget.defense);
+                    selectedTarget.TakeDamage(attackValue);
+                    battleUI.ShowMessage($"{player.characterName} attacks {selectedTarget.characterName} for {actualDamage} damage!");
                 }
                 else if (selectedAction == BattleAction.SPECIAL)
                 {
-                    int damage = player.attack * 2;
-                    selectedTarget.TakeDamage(damage);
-                    battleUI.ShowMessage($"{player.characterName} uses special attack on {selectedTarget.characterName} for {damage} damage!");
+                    int attackValue = player.attack * 2;
+                    int actualDamage = Mathf.Max(1, attackValue - selectedTarget.defense);
+                    selectedTarget.TakeDamage(attackValue);
+                    battleUI.ShowMessage($"{player.characterName} uses special attack on {selectedTarget.characterName} for {actualDamage} damage!");
                 }
                 
                 yield return new WaitForSeconds(1.5f);
@@ -201,9 +203,10 @@ public class BattleManager : MonoBehaviour
         if (alivePlayerCharacters.Count > 0)
         {
             Character target = alivePlayerCharacters[Random.Range(0, alivePlayerCharacters.Count)];
-            int damage = enemy.attack;
-            target.TakeDamage(damage);
-            battleUI.ShowMessage($"{enemy.characterName} attacks {target.characterName} for {damage} damage!");
+            int attackValue = enemy.attack;
+            int actualDamage = Mathf.Max(1, attackValue - target.defense);
+            target.TakeDamage(attackValue);
+            battleUI.ShowMessage($"{enemy.characterName} attacks {target.characterName} for {actualDamage} damage!");
         }
 
         yield return new WaitForSeconds(1.5f);

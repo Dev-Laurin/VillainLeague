@@ -58,19 +58,25 @@ Player wins!
 
 ### Test Character System
 
+The `BattleSystemExample.cs` script contains several example methods that demonstrate how the character system works. To test these:
+
 1. Open `Assets/Scripts/BattleSystemExample.cs`
-2. Uncomment the test methods in `Start()`:
+2. Find the `Start()` method (around line 86)
+3. Uncomment the example method calls:
    ```csharp
    void Start()
    {
+       // Uncomment these to see examples in console
        ExampleCreateCharacters();
        ExampleDamageCalculation();
        ExampleHealing();
        ExampleCheckAlive();
    }
    ```
-3. Attach this script to any GameObject in the scene
-4. Press Play and check Console for output
+4. Attach this script to any GameObject in the scene (or create a new empty GameObject)
+5. Press Play and check Console for output
+
+**Note**: By default, these methods are commented out so they don't interfere with the actual battle system. You can run them separately for testing.
 
 ### Test Turn Manager
 
