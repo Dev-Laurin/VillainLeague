@@ -32,6 +32,10 @@ public class Move
     // Secondary resource gain (e.g., Style)
     public int styleGain;
     
+    // Secondary resource cost (e.g., Style) - for super/ultimate moves
+    public int secondaryResourceCost;
+    public bool isSuper; // True if this is a super/ultimate move
+    
     // Area of effect
     public int radius;
     public int moveRange;

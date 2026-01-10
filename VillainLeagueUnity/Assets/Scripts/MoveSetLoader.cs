@@ -28,6 +28,8 @@ public class MoveData
     public int bleed;
     public int counterDamage;
     public int styleGain; // Secondary resource gain
+    public int secondaryResourceCost; // Secondary resource cost (for super moves)
+    public bool isSuper; // True if this is a super/ultimate move
     public int radius;
     public int moveRange;
     public int durationTurns = 1;
@@ -130,6 +132,8 @@ public static class MoveSetLoader
             move.bleed = moveData.bleed;
             move.counterDamage = moveData.counterDamage;
             move.styleGain = moveData.styleGain;
+            move.secondaryResourceCost = moveData.secondaryResourceCost;
+            move.isSuper = moveData.isSuper;
             move.radius = moveData.radius;
             move.moveRange = moveData.moveRange;
             move.durationTurns = moveData.durationTurns;

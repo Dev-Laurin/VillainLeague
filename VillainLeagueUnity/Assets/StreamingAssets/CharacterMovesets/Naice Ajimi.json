@@ -144,6 +144,8 @@
       "manaCost": 6,
       "damage": 5,
       "styleGain": 3,
+      "secondaryResourceCost": 6,
+      "isSuper": true,
       "targetType": "AllEnemies"
     }
   ]

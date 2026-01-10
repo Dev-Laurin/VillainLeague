@@ -145,6 +145,8 @@
       "armor": 3,
       "radius": 3,
       "durationTurns": 1,
+      "secondaryResourceCost": 6,
+      "isSuper": true,
       "targetType": "AllAllies"
     }
   ]

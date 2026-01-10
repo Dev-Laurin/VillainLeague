@@ -180,13 +180,22 @@ public class BattleUISetup : MonoBehaviour
         
         // Keep original action buttons (will be hidden when move system is active)
         battleUI.attackButton = CreateButton("AttackButton", parent, 
-            new Vector2(-280, -380), new Vector2(240, 80), "ATTACK", OnAttackButtonSetup);
+            new Vector2(-280, -380), new Vector2(240, 80), "NORMAL TURN", OnAttackButtonSetup);
         
         battleUI.defendButton = CreateButton("DefendButton", parent, 
             new Vector2(0, -380), new Vector2(240, 80), "DEFEND", OnDefendButtonSetup);
         
         battleUI.specialButton = CreateButton("SpecialButton", parent, 
             new Vector2(280, -380), new Vector2(240, 80), "SPECIAL", OnSpecialButtonSetup);
+        
+        // Super buttons (initially hidden)
+        battleUI.superButton = CreateButton("SuperButton", parent,
+            new Vector2(-150, -380), new Vector2(280, 80), "USE SUPER", OnSuperButtonSetup);
+        battleUI.superButton.gameObject.SetActive(false);
+        
+        battleUI.teamSuperButton = CreateButton("TeamSuperButton", parent,
+            new Vector2(150, -380), new Vector2(280, 80), "TEAM SUPER", OnTeamSuperButtonSetup);
+        battleUI.teamSuperButton.gameObject.SetActive(false);
     }
 
     void SetupTargetSelectionPanel(Transform parent)
@@ -335,5 +344,7 @@ public class BattleUISetup : MonoBehaviour
     void OnAttackButtonSetup(Button button) { }
     void OnDefendButtonSetup(Button button) { }
     void OnSpecialButtonSetup(Button button) { }
+    void OnSuperButtonSetup(Button button) { }
+    void OnTeamSuperButtonSetup(Button button) { }
     void OnTargetButtonSetup(Button button) { }
 }

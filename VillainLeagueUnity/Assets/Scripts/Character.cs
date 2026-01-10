@@ -57,4 +57,10 @@ public class Character
         currentHP = Mathf.Min(currentHP, maxHP);
         Debug.Log($"{characterName} heals for {amount}! HP: {currentHP}/{maxHP}");
     }
+    
+    public bool IsSuperReady()
+    {
+        return secondaryResource != null && 
+               secondaryResource.currentResource >= secondaryResource.maxResource;
+    }
 }

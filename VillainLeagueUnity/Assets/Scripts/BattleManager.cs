@@ -150,8 +150,28 @@ public class BattleManager : MonoBehaviour
         // Check if character has a moveset
         if (player.moveSet != null && player.moveSet.moves != null && player.moveSet.moves.Count > 0)
         {
-            // Use move selection system
-            yield return StartCoroutine(SelectMove(player));
+            // Check if both heroes have supers ready for team super option
+            bool teamSuperAvailable = AreBothHeroSupersReady();
+            
+            if (teamSuperAvailable)
+            {
+                // Offer choice: normal turn, individual super, or team super
+                bool teamSuperChosen = false;
+                yield return StartCoroutine(SelectSuperOption(player, (bool isTeamSuper) => {
+                    teamSuperChosen = isTeamSuper;
+                }));
+                
+                // If team super was selected, execute it and end turn
+                if (teamSuperChosen)
+                {
+                    yield return StartCoroutine(ExecuteTeamSuper());
+                    yield break;
+                }
+            }
+            
+            // Use move selection system (normal or super moves)
+            bool showOnlySupers = player.IsSuperReady() && (selectedAction == BattleAction.SPECIAL);
+            yield return StartCoroutine(SelectMove(player, showOnlySupers));
             
             if (selectedMove != null)
             {
@@ -232,16 +252,16 @@ public class BattleManager : MonoBehaviour
         }
     }
     
-    IEnumerator SelectMove(Character character)
+    IEnumerator SelectMove(Character character, bool showOnlySupers = false)
     {
-        battleUI.ShowMessage("Select a move...");
+        battleUI.ShowMessage(showOnlySupers ? "Select a super move..." : "Select a move...");
         battleUI.ShowMoveSelection(true);
         
         bool moveSelected = false;
         selectedMove = null;
         
         // Display moves with resource info
-        battleUI.DisplayMoves(character.moveSet.moves, character.moveSet.resource, (Move move) =>
+        battleUI.DisplayMoves(character.moveSet.moves, character.moveSet.resource, character.secondaryResource, showOnlySupers, (Move move) =>
         {
             selectedMove = move;
             moveSelected = true;
@@ -258,10 +278,19 @@ public class BattleManager : MonoBehaviour
     
     IEnumerator ExecuteMove(Character caster, Move move)
     {
-        // Check if can afford
+        // Check if can afford primary resource
         if (caster.moveSet.resource != null && !caster.moveSet.resource.CanAfford(move.resourceCost))
         {
             battleUI.ShowMessage($"Not enough {caster.moveSet.resource.resourceName}!");
+            yield return new WaitForSeconds(1f);
+            yield break;
+        }
+        
+        // Check if can afford secondary resource (for super moves)
+        if (move.secondaryResourceCost > 0 && caster.secondaryResource != null && 
+            !caster.secondaryResource.CanAfford(move.secondaryResourceCost))
+        {
+            battleUI.ShowMessage($"Not enough {caster.secondaryResource.resourceName}!");
             yield return new WaitForSeconds(1f);
             yield break;
         }
@@ -281,12 +310,18 @@ public class BattleManager : MonoBehaviour
             }
         }
         
-        // Spend resource
+        // Spend resources
         if (caster.moveSet.resource != null)
         {
             caster.moveSet.resource.Spend(move.resourceCost);
-            UpdateAllUI();
         }
+        
+        if (move.secondaryResourceCost > 0 && caster.secondaryResource != null)
+        {
+            caster.secondaryResource.Spend(move.secondaryResourceCost);
+        }
+        
+        UpdateAllUI();
         
         // Execute move effects
         battleUI.ShowMessage($"{caster.characterName} uses {move.moveName}!");
@@ -504,5 +539,126 @@ public class BattleManager : MonoBehaviour
         {
             battleUI.UpdateCharacterUI(enemySquad[i], i);
         }
+    }
+    
+    bool AreBothHeroSupersReady()
+    {
+        int readyCount = 0;
+        foreach (Character hero in playerSquad)
+        {
+            if (hero.IsAlive() && hero.IsSuperReady())
+            {
+                readyCount++;
+            }
+        }
+        return readyCount >= 2;
+    }
+    
+    IEnumerator SelectSuperOption(Character player, System.Action<bool> onComplete)
+    {
+        battleUI.ShowMessage("Choose your action...");
+        
+        bool optionSelected = false;
+        bool isTeamSuper = false;
+        selectedAction = BattleAction.ATTACK; // Default to normal action
+        
+        // Show buttons: Normal Turn, Individual Super (if ready), Team Super
+        bool superReady = player.IsSuperReady();
+        battleUI.SetSuperButtonsActive(superReady, true);
+        
+        // Setup normal move button (use attack button as "Normal Turn")
+        battleUI.attackButton.onClick.RemoveAllListeners();
+        battleUI.attackButton.onClick.AddListener(() => 
+        {
+            selectedAction = BattleAction.ATTACK;
+            isTeamSuper = false;
+            optionSelected = true;
+        });
+        battleUI.attackButton.gameObject.SetActive(true);
+        
+        // Setup individual super button (if ready)
+        if (superReady && battleUI.superButton != null)
+        {
+            battleUI.superButton.onClick.RemoveAllListeners();
+            battleUI.superButton.onClick.AddListener(() => 
+            {
+                selectedAction = BattleAction.SPECIAL;
+                isTeamSuper = false;
+                optionSelected = true;
+            });
+        }
+        
+        // Setup team super button
+        if (battleUI.teamSuperButton != null)
+        {
+            battleUI.teamSuperButton.onClick.RemoveAllListeners();
+            battleUI.teamSuperButton.onClick.AddListener(() => 
+            {
+                isTeamSuper = true;
+                optionSelected = true;
+            });
+        }
+        
+        // Wait for selection
+        while (!optionSelected)
+        {
+            yield return null;
+        }
+        
+        // Hide buttons
+        battleUI.attackButton.gameObject.SetActive(false);
+        battleUI.SetSuperButtonsActive(false, false);
+        
+        onComplete(isTeamSuper);
+    }
+    
+    IEnumerator ExecuteTeamSuper()
+    {
+        battleUI.ShowMessage("Team Super Attack!");
+        yield return new WaitForSeconds(1f);
+        
+        // Get both alive heroes
+        List<Character> aliveHeroes = new List<Character>();
+        foreach (Character hero in playerSquad)
+        {
+            if (hero.IsAlive())
+            {
+                aliveHeroes.Add(hero);
+            }
+        }
+        
+        if (aliveHeroes.Count < 2)
+        {
+            battleUI.ShowMessage("Need both heroes alive for team super!");
+            yield return new WaitForSeconds(1.5f);
+            yield break;
+        }
+        
+        // Spend secondary resources
+        foreach (Character hero in aliveHeroes)
+        {
+            if (hero.secondaryResource != null)
+            {
+                hero.secondaryResource.currentResource = 0;
+            }
+        }
+        UpdateAllUI();
+        
+        // Execute team attack - deal massive damage to all enemies
+        battleUI.ShowMessage($"{aliveHeroes[0].characterName} and {aliveHeroes[1].characterName} unleash their combined power!");
+        yield return new WaitForSeconds(1.5f);
+        
+        foreach (Character enemy in enemySquad)
+        {
+            if (enemy.IsAlive())
+            {
+                int combinedDamage = 15; // Team super does 15 base damage
+                int actualDamage = Mathf.Max(1, combinedDamage - enemy.defense);
+                enemy.TakeDamage(combinedDamage);
+            }
+        }
+        
+        battleUI.ShowMessage("Devastating team attack hits all enemies!");
+        yield return new WaitForSeconds(2f);
     }
 }
