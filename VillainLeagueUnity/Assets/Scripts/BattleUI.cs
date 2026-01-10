@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
 
 public class BattleUI : MonoBehaviour
 {
@@ -8,10 +9,12 @@ public class BattleUI : MonoBehaviour
     public TextMeshProUGUI player1NameText;
     public TextMeshProUGUI player1HPText;
     public Slider player1HPBar;
+    public TextMeshProUGUI player1ResourceText;
     
     public TextMeshProUGUI player2NameText;
     public TextMeshProUGUI player2HPText;
     public Slider player2HPBar;
+    public TextMeshProUGUI player2ResourceText;
 
     [Header("Enemy UI")]
     public TextMeshProUGUI enemy1NameText;
@@ -32,6 +35,11 @@ public class BattleUI : MonoBehaviour
     public Button defendButton;
     public Button specialButton;
 
+    [Header("Move Selection")]
+    public GameObject moveSelectionPanel;
+    public Transform moveButtonContainer;
+    private List<Button> moveButtons = new List<Button>();
+
     [Header("Target Selection")]
     public GameObject targetSelectionPanel;
     public Button target1Button;
@@ -41,6 +49,8 @@ public class BattleUI : MonoBehaviour
     {
         if (targetSelectionPanel != null)
             targetSelectionPanel.SetActive(false);
+        if (moveSelectionPanel != null)
+            moveSelectionPanel.SetActive(false);
     }
 
     public void UpdateCharacterUI(Character character, int index)
@@ -50,6 +60,7 @@ public class BattleUI : MonoBehaviour
         TextMeshProUGUI nameText = null;
         TextMeshProUGUI hpText = null;
         Slider hpBar = null;
+        TextMeshProUGUI resourceText = null;
 
         if (character.isPlayerCharacter)
         {
@@ -58,12 +69,14 @@ public class BattleUI : MonoBehaviour
                 nameText = player1NameText;
                 hpText = player1HPText;
                 hpBar = player1HPBar;
+                resourceText = player1ResourceText;
             }
             else if (index == 1)
             {
                 nameText = player2NameText;
                 hpText = player2HPText;
                 hpBar = player2HPBar;
+                resourceText = player2ResourceText;
             }
         }
         else
@@ -88,6 +101,13 @@ public class BattleUI : MonoBehaviour
         {
             hpBar.maxValue = character.maxHP;
             hpBar.value = character.currentHP;
+        }
+        
+        // Update resource display for player characters
+        if (resourceText != null && character.moveSet != null && character.moveSet.resource != null)
+        {
+            CharacterResource res = character.moveSet.resource;
+            resourceText.text = $"{res.resourceName}: {res.currentResource}/{res.maxResource}";
         }
     }
 
@@ -120,5 +140,105 @@ public class BattleUI : MonoBehaviour
     {
         if (targetSelectionPanel != null)
             targetSelectionPanel.SetActive(show);
+    }
+    
+    public void ShowMoveSelection(bool show)
+    {
+        if (moveSelectionPanel != null)
+            moveSelectionPanel.SetActive(show);
+    }
+    
+    public void DisplayMoves(List<Move> moves, CharacterResource resource, System.Action<Move> onMoveSelected)
+    {
+        // Clear existing move buttons
+        foreach (Button btn in moveButtons)
+        {
+            if (btn != null)
+                Destroy(btn.gameObject);
+        }
+        moveButtons.Clear();
+        
+        if (moveButtonContainer == null || moves == null) return;
+        
+        // Create a button for each move
+        for (int i = 0; i < moves.Count; i++)
+        {
+            Move move = moves[i];
+            GameObject buttonObj = new GameObject($"MoveButton_{i}");
+            buttonObj.transform.SetParent(moveButtonContainer, false);
+            
+            RectTransform rectTransform = buttonObj.AddComponent<RectTransform>();
+            rectTransform.sizeDelta = new Vector2(700, 80);
+            
+            Image image = buttonObj.AddComponent<Image>();
+            Button button = buttonObj.AddComponent<Button>();
+            
+            // Check if move can be afforded
+            bool canAfford = resource == null || resource.CanAfford(move.resourceCost);
+            
+            if (canAfford)
+            {
+                image.color = new Color(0.3f, 0.3f, 0.3f);
+                ColorBlock colors = button.colors;
+                colors.normalColor = new Color(0.3f, 0.3f, 0.3f);
+                colors.highlightedColor = new Color(0.5f, 0.5f, 0.5f);
+                colors.pressedColor = new Color(0.2f, 0.2f, 0.2f);
+                button.colors = colors;
+                
+                button.onClick.AddListener(() => onMoveSelected(move));
+            }
+            else
+            {
+                image.color = new Color(0.2f, 0.2f, 0.2f);
+                button.interactable = false;
+            }
+            
+            // Move name
+            GameObject nameTextObj = new GameObject("Name");
+            nameTextObj.transform.SetParent(buttonObj.transform, false);
+            RectTransform nameRect = nameTextObj.AddComponent<RectTransform>();
+            nameRect.anchorMin = new Vector2(0, 0.5f);
+            nameRect.anchorMax = new Vector2(0.7f, 1);
+            nameRect.sizeDelta = Vector2.zero;
+            
+            TextMeshProUGUI nameText = nameTextObj.AddComponent<TextMeshProUGUI>();
+            nameText.text = move.moveName;
+            nameText.fontSize = 24;
+            nameText.alignment = TextAlignmentOptions.Left;
+            nameText.margin = new Vector4(10, 0, 0, 0);
+            nameText.color = canAfford ? Color.white : new Color(0.5f, 0.5f, 0.5f);
+            
+            // Cost
+            GameObject costTextObj = new GameObject("Cost");
+            costTextObj.transform.SetParent(buttonObj.transform, false);
+            RectTransform costRect = costTextObj.AddComponent<RectTransform>();
+            costRect.anchorMin = new Vector2(0.7f, 0.5f);
+            costRect.anchorMax = new Vector2(1, 1);
+            costRect.sizeDelta = Vector2.zero;
+            
+            TextMeshProUGUI costText = costTextObj.AddComponent<TextMeshProUGUI>();
+            costText.text = $"Cost: {move.resourceCost}";
+            costText.fontSize = 20;
+            costText.alignment = TextAlignmentOptions.Right;
+            costText.margin = new Vector4(0, 0, 10, 0);
+            costText.color = canAfford ? new Color(0.7f, 0.9f, 1f) : new Color(0.5f, 0.5f, 0.5f);
+            
+            // Description
+            GameObject descTextObj = new GameObject("Description");
+            descTextObj.transform.SetParent(buttonObj.transform, false);
+            RectTransform descRect = descTextObj.AddComponent<RectTransform>();
+            descRect.anchorMin = new Vector2(0, 0);
+            descRect.anchorMax = new Vector2(1, 0.5f);
+            descRect.sizeDelta = Vector2.zero;
+            
+            TextMeshProUGUI descText = descTextObj.AddComponent<TextMeshProUGUI>();
+            descText.text = move.description;
+            descText.fontSize = 16;
+            descText.alignment = TextAlignmentOptions.Left;
+            descText.margin = new Vector4(10, 0, 10, 0);
+            descText.color = canAfford ? new Color(0.8f, 0.8f, 0.8f) : new Color(0.5f, 0.5f, 0.5f);
+            
+            moveButtons.Add(button);
+        }
     }
 }
