@@ -33,7 +33,6 @@ public class BattleManager : MonoBehaviour
     private BattleAction selectedAction;
     private Character selectedTarget;
     private bool isDefending = false;
-    private Move selectedMove;
 
     void Start()
     {
@@ -43,26 +42,12 @@ public class BattleManager : MonoBehaviour
     void SetupBattle()
     {
         // Initialize player squad with 2 characters
-        Character bellinor = new Character("Bellinor Chabbeneoux", 120, 18, 6, true);
-        bellinor.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Bellinor Chabbeneoux"));
-        // Initialize Resolve as a secondary resource for Bellinor (gained when taking damage or protecting allies)
-        bellinor.secondaryResource = new CharacterResource("Resolve", 6, 0); // Max 6, no auto-regen (gained through combat)
-        playerSquad.Add(bellinor);
-        
-        Character naice = new Character("Naice Ajimi", 80, 20, 3, true);
-        naice.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Naice Ajimi"));
-        // Initialize Style as a secondary resource for Naice
-        naice.secondaryResource = new CharacterResource("Style", 6, 0); // Max 6, no auto-regen (gained through moves)
-        playerSquad.Add(naice);
+        playerSquad.Add(new Character("Hero 1", 100, 15, 5, true));
+        playerSquad.Add(new Character("Hero 2", 80, 20, 3, true));
 
         // Initialize enemy squad with 2 characters
-        Character villain1 = new Character("Villain 1", 70, 12, 4, false);
-        villain1.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Villain 1"));
-        enemySquad.Add(villain1);
-        
-        Character villain2 = new Character("Villain 2", 90, 10, 6, false);
-        villain2.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Villain 2"));
-        enemySquad.Add(villain2);
+        enemySquad.Add(new Character("Villain 1", 70, 12, 4, false));
+        enemySquad.Add(new Character("Villain 2", 90, 10, 6, false));
 
         // Setup turn order
         List<Character> allCharacters = new List<Character>();
@@ -139,240 +124,82 @@ public class BattleManager : MonoBehaviour
     IEnumerator PlayerTurn(Character player)
     {
         battleUI.ShowMessage($"{player.characterName}'s turn!");
+        battleUI.SetActionButtonsActive(true);
         
-        // Regenerate resource at start of turn
-        if (player.moveSet != null && player.moveSet.resource != null)
-        {
-            player.moveSet.resource.Regenerate();
-            UpdateAllUI(); // Update resource display
-        }
+        // Wait for player to select action
+        bool actionSelected = false;
+        selectedAction = BattleAction.ATTACK;
         
-        // Check if character has a moveset
-        if (player.moveSet != null && player.moveSet.moves != null && player.moveSet.moves.Count > 0)
+        // Setup button listeners
+        battleUI.attackButton.onClick.RemoveAllListeners();
+        battleUI.attackButton.onClick.AddListener(() => 
         {
-            // Use move selection system
-            yield return StartCoroutine(SelectMove(player));
-            
-            if (selectedMove != null)
-            {
-                yield return StartCoroutine(ExecuteMove(player, selectedMove));
-            }
-        }
-        else
-        {
-            // Fall back to old system for characters without movesets
-            battleUI.SetActionButtonsActive(true);
-            
-            // Wait for player to select action
-            bool actionSelected = false;
             selectedAction = BattleAction.ATTACK;
-            
-            // Setup button listeners
-            battleUI.attackButton.onClick.RemoveAllListeners();
-            battleUI.attackButton.onClick.AddListener(() => 
-            {
-                selectedAction = BattleAction.ATTACK;
-                actionSelected = true;
-            });
-
-            battleUI.defendButton.onClick.RemoveAllListeners();
-            battleUI.defendButton.onClick.AddListener(() => 
-            {
-                selectedAction = BattleAction.DEFEND;
-                actionSelected = true;
-            });
-
-            battleUI.specialButton.onClick.RemoveAllListeners();
-            battleUI.specialButton.onClick.AddListener(() => 
-            {
-                selectedAction = BattleAction.SPECIAL;
-                actionSelected = true;
-            });
-
-            // Wait for action selection
-            while (!actionSelected)
-            {
-                yield return null;
-            }
-
-            battleUI.SetActionButtonsActive(false);
-
-            // Execute action
-            if (selectedAction == BattleAction.DEFEND)
-            {
-                isDefending = true;
-                battleUI.ShowMessage($"{player.characterName} defends!");
-                yield return new WaitForSeconds(1f);
-            }
-            else
-            {
-                // Select target
-                yield return StartCoroutine(SelectTarget(enemySquad));
-                
-                if (selectedTarget != null && selectedTarget.IsAlive())
-                {
-                    if (selectedAction == BattleAction.ATTACK)
-                    {
-                        int attackValue = player.attack;
-                        int actualDamage = Mathf.Max(1, attackValue - selectedTarget.defense);
-                        selectedTarget.TakeDamage(attackValue);
-                        battleUI.ShowMessage($"{player.characterName} attacks {selectedTarget.characterName} for {actualDamage} damage!");
-                    }
-                    else if (selectedAction == BattleAction.SPECIAL)
-                    {
-                        int attackValue = player.attack * 2;
-                        int actualDamage = Mathf.Max(1, attackValue - selectedTarget.defense);
-                        selectedTarget.TakeDamage(attackValue);
-                        battleUI.ShowMessage($"{player.characterName} uses special attack on {selectedTarget.characterName} for {actualDamage} damage!");
-                    }
-                    
-                    yield return new WaitForSeconds(1.5f);
-                }
-            }
-        }
-    }
-    
-    IEnumerator SelectMove(Character character)
-    {
-        battleUI.ShowMessage("Select a move...");
-        battleUI.ShowMoveSelection(true);
-        
-        bool moveSelected = false;
-        selectedMove = null;
-        
-        // Display moves with resource info
-        battleUI.DisplayMoves(character.moveSet.moves, character.moveSet.resource, (Move move) =>
-        {
-            selectedMove = move;
-            moveSelected = true;
+            actionSelected = true;
         });
-        
-        // Wait for selection
-        while (!moveSelected)
+
+        battleUI.defendButton.onClick.RemoveAllListeners();
+        battleUI.defendButton.onClick.AddListener(() => 
+        {
+            selectedAction = BattleAction.DEFEND;
+            actionSelected = true;
+        });
+
+        battleUI.specialButton.onClick.RemoveAllListeners();
+        battleUI.specialButton.onClick.AddListener(() => 
+        {
+            selectedAction = BattleAction.SPECIAL;
+            actionSelected = true;
+        });
+
+        // Wait for action selection
+        while (!actionSelected)
         {
             yield return null;
         }
-        
-        battleUI.ShowMoveSelection(false);
-    }
-    
-    IEnumerator ExecuteMove(Character caster, Move move)
-    {
-        // Check if can afford
-        if (caster.moveSet.resource != null && !caster.moveSet.resource.CanAfford(move.resourceCost))
+
+        battleUI.SetActionButtonsActive(false);
+
+        // Execute action
+        if (selectedAction == BattleAction.DEFEND)
         {
-            battleUI.ShowMessage($"Not enough {caster.moveSet.resource.resourceName}!");
+            isDefending = true;
+            battleUI.ShowMessage($"{player.characterName} defends!");
             yield return new WaitForSeconds(1f);
-            yield break;
         }
-        
-        // Determine if we need a target
-        bool needsTarget = move.targetType == MoveTargetType.SingleEnemy || move.targetType == MoveTargetType.SingleAlly;
-        
-        if (needsTarget)
+        else
         {
-            // Select target based on move type
-            List<Character> targetList = move.targetType == MoveTargetType.SingleEnemy ? enemySquad : playerSquad;
-            yield return StartCoroutine(SelectTarget(targetList));
+            // Select target
+            yield return StartCoroutine(SelectTarget(enemySquad));
             
-            if (selectedTarget == null || !selectedTarget.IsAlive())
+            if (selectedTarget != null && selectedTarget.IsAlive())
             {
-                yield break;
-            }
-        }
-        
-        // Spend resource
-        if (caster.moveSet.resource != null)
-        {
-            caster.moveSet.resource.Spend(move.resourceCost);
-            UpdateAllUI();
-        }
-        
-        // Execute move effects
-        battleUI.ShowMessage($"{caster.characterName} uses {move.moveName}!");
-        yield return new WaitForSeconds(0.5f);
-        
-        if (needsTarget && selectedTarget != null)
-        {
-            // Apply damage
-            if (move.damage > 0)
-            {
-                int totalDamage = move.damage * move.hits;
-                int actualDamage = Mathf.Max(1, totalDamage - selectedTarget.defense);
-                selectedTarget.TakeDamage(totalDamage);
-                
-                string hitText = move.hits > 1 ? $" ({move.hits} hits)" : "";
-                battleUI.ShowMessage($"{caster.characterName}'s {move.moveName} hits {selectedTarget.characterName} for {actualDamage} damage{hitText}!");
-            }
-            
-            // Apply healing
-            if (move.healing > 0)
-            {
-                selectedTarget.Heal(move.healing);
-                battleUI.ShowMessage($"{caster.characterName}'s {move.moveName} heals {selectedTarget.characterName} for {move.healing}!");
-            }
-        }
-        else if (move.targetType == MoveTargetType.Self)
-        {
-            if (move.healing > 0)
-            {
-                caster.Heal(move.healing);
-                battleUI.ShowMessage($"{caster.characterName} heals for {move.healing}!");
-            }
-            else
-            {
-                battleUI.ShowMessage($"{caster.characterName} uses {move.moveName}!");
-            }
-        }
-        else if (move.targetType == MoveTargetType.AllEnemies)
-        {
-            foreach (Character enemy in enemySquad)
-            {
-                if (enemy.IsAlive() && move.damage > 0)
+                if (selectedAction == BattleAction.ATTACK)
                 {
-                    int actualDamage = Mathf.Max(1, move.damage - enemy.defense);
-                    enemy.TakeDamage(move.damage);
+                    int attackValue = player.attack;
+                    int actualDamage = Mathf.Max(1, attackValue - selectedTarget.defense);
+                    selectedTarget.TakeDamage(attackValue);
+                    battleUI.ShowMessage($"{player.characterName} attacks {selectedTarget.characterName} for {actualDamage} damage!");
                 }
-            }
-            battleUI.ShowMessage($"{caster.characterName}'s {move.moveName} hits all enemies!");
-        }
-        else if (move.targetType == MoveTargetType.AllAllies)
-        {
-            battleUI.ShowMessage($"{caster.characterName} uses {move.moveName} on all allies!");
-        }
-        
-        // Gain secondary resource (Style) if move has styleGain
-        if (move.styleGain > 0 && caster.secondaryResource != null)
-        {
-            int oldStyle = caster.secondaryResource.currentResource;
-            caster.secondaryResource.currentResource = Mathf.Min(
-                caster.secondaryResource.currentResource + move.styleGain,
-                caster.secondaryResource.maxResource
-            );
-            int styleGained = caster.secondaryResource.currentResource - oldStyle;
-            if (styleGained > 0)
-            {
-                battleUI.ShowMessage($"{caster.characterName} gains {styleGained} {caster.secondaryResource.resourceName}!");
-                UpdateAllUI();
-                yield return new WaitForSeconds(0.8f);
+                else if (selectedAction == BattleAction.SPECIAL)
+                {
+                    int attackValue = player.attack * 2;
+                    int actualDamage = Mathf.Max(1, attackValue - selectedTarget.defense);
+                    selectedTarget.TakeDamage(attackValue);
+                    battleUI.ShowMessage($"{player.characterName} uses special attack on {selectedTarget.characterName} for {actualDamage} damage!");
+                }
+                
+                yield return new WaitForSeconds(1.5f);
             }
         }
-        
-        yield return new WaitForSeconds(1.5f);
     }
 
     IEnumerator EnemyTurn(Character enemy)
     {
         battleUI.ShowMessage($"{enemy.characterName}'s turn!");
         yield return new WaitForSeconds(1f);
-        
-        // Regenerate resource
-        if (enemy.moveSet != null && enemy.moveSet.resource != null)
-        {
-            enemy.moveSet.resource.Regenerate();
-        }
 
-        // Simple AI: attack random alive player with a random affordable move
+        // Simple AI: attack random alive player
         List<Character> alivePlayerCharacters = new List<Character>();
         foreach (Character c in playerSquad)
         {
@@ -383,45 +210,10 @@ public class BattleManager : MonoBehaviour
         if (alivePlayerCharacters.Count > 0)
         {
             Character target = alivePlayerCharacters[Random.Range(0, alivePlayerCharacters.Count)];
-            
-            // Try to use a move if available
-            if (enemy.moveSet != null && enemy.moveSet.moves != null && enemy.moveSet.moves.Count > 0)
-            {
-                // Find affordable offensive moves
-                List<Move> affordableMoves = new List<Move>();
-                foreach (Move move in enemy.moveSet.moves)
-                {
-                    if ((enemy.moveSet.resource == null || enemy.moveSet.resource.CanAfford(move.resourceCost)) &&
-                        (move.damage > 0 || move.targetType == MoveTargetType.AllEnemies))
-                    {
-                        affordableMoves.Add(move);
-                    }
-                }
-                
-                if (affordableMoves.Count > 0)
-                {
-                    Move chosenMove = affordableMoves[Random.Range(0, affordableMoves.Count)];
-                    selectedMove = chosenMove;
-                    selectedTarget = target;
-                    yield return StartCoroutine(ExecuteMove(enemy, chosenMove));
-                }
-                else
-                {
-                    // No affordable moves, basic attack
-                    int attackValue = enemy.attack;
-                    int actualDamage = Mathf.Max(1, attackValue - target.defense);
-                    target.TakeDamage(attackValue);
-                    battleUI.ShowMessage($"{enemy.characterName} attacks {target.characterName} for {actualDamage} damage!");
-                }
-            }
-            else
-            {
-                // No moveset, use basic attack
-                int attackValue = enemy.attack;
-                int actualDamage = Mathf.Max(1, attackValue - target.defense);
-                target.TakeDamage(attackValue);
-                battleUI.ShowMessage($"{enemy.characterName} attacks {target.characterName} for {actualDamage} damage!");
-            }
+            int attackValue = enemy.attack;
+            int actualDamage = Mathf.Max(1, attackValue - target.defense);
+            target.TakeDamage(attackValue);
+            battleUI.ShowMessage($"{enemy.characterName} attacks {target.characterName} for {actualDamage} damage!");
         }
 
         yield return new WaitForSeconds(1.5f);

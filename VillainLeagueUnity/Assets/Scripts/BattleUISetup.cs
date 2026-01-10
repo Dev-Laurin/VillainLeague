@@ -79,28 +79,20 @@ public class BattleUISetup : MonoBehaviour
     void SetupPlayerUI(Transform parent)
     {
         // Player Panel Background
-        GameObject playerPanel = CreatePanel("PlayerPanel", parent, new Vector2(-600, 250), new Vector2(400, 400));
+        GameObject playerPanel = CreatePanel("PlayerPanel", parent, new Vector2(-600, 250), new Vector2(400, 300));
         
-        // Hero 1 (Bellinor)
+        // Hero 1
         battleUI.player1NameText = CreateText("Player1Name", playerPanel.transform, 
-            new Vector2(0, 160), new Vector2(380, 50), "Hero 1", 32, TextAlignmentOptions.Left);
+            new Vector2(0, 100), new Vector2(380, 50), "Hero 1", 32, TextAlignmentOptions.Left);
         battleUI.player1NameText.color = new Color(0.2f, 0.8f, 0.2f);
         
         battleUI.player1HPText = CreateText("Player1HP", playerPanel.transform, 
-            new Vector2(0, 120), new Vector2(380, 40), "120/120", 24, TextAlignmentOptions.Left);
+            new Vector2(0, 60), new Vector2(380, 40), "100/100", 24, TextAlignmentOptions.Left);
         
         battleUI.player1HPBar = CreateSlider("Player1HPBar", playerPanel.transform, 
-            new Vector2(0, 80), new Vector2(380, 30), 120, 120, new Color(0.2f, 0.8f, 0.2f));
-        
-        battleUI.player1ResourceText = CreateText("Player1Resource", playerPanel.transform,
-            new Vector2(0, 45), new Vector2(380, 30), "Resolve: 6/6", 20, TextAlignmentOptions.Left);
-        battleUI.player1ResourceText.color = new Color(0.7f, 0.9f, 1f);
-        
-        battleUI.player1SecondaryResourceText = CreateText("Player1SecondaryResource", playerPanel.transform,
-            new Vector2(0, 15), new Vector2(380, 30), "Resolve: 0/6", 18, TextAlignmentOptions.Left);
-        battleUI.player1SecondaryResourceText.color = new Color(1f, 0.8f, 0.3f);
+            new Vector2(0, 20), new Vector2(380, 30), 100, 100, new Color(0.2f, 0.8f, 0.2f));
 
-        // Hero 2 (Naice)
+        // Hero 2
         battleUI.player2NameText = CreateText("Player2Name", playerPanel.transform, 
             new Vector2(0, -40), new Vector2(380, 50), "Hero 2", 32, TextAlignmentOptions.Left);
         battleUI.player2NameText.color = new Color(0.2f, 0.8f, 0.2f);
@@ -110,14 +102,6 @@ public class BattleUISetup : MonoBehaviour
         
         battleUI.player2HPBar = CreateSlider("Player2HPBar", playerPanel.transform, 
             new Vector2(0, -120), new Vector2(380, 30), 80, 80, new Color(0.2f, 0.8f, 0.2f));
-        
-        battleUI.player2ResourceText = CreateText("Player2Resource", playerPanel.transform,
-            new Vector2(0, -155), new Vector2(380, 30), "Mana: 10/10", 20, TextAlignmentOptions.Left);
-        battleUI.player2ResourceText.color = new Color(0.7f, 0.9f, 1f);
-        
-        battleUI.player2SecondaryResourceText = CreateText("Player2SecondaryResource", playerPanel.transform,
-            new Vector2(0, -185), new Vector2(380, 30), "Style: 0/6", 18, TextAlignmentOptions.Left);
-        battleUI.player2SecondaryResourceText.color = new Color(1f, 0.8f, 0.3f);
     }
 
     void SetupEnemyUI(Transform parent)
@@ -150,35 +134,6 @@ public class BattleUISetup : MonoBehaviour
 
     void SetupActionButtons(Transform parent)
     {
-        // Create a move selection panel
-        GameObject movePanel = CreatePanel("MoveSelectionPanel", parent, new Vector2(0, -200), new Vector2(750, 450));
-        movePanel.SetActive(false);
-        battleUI.moveSelectionPanel = movePanel;
-        
-        // Panel title
-        CreateText("MoveTitle", movePanel.transform, new Vector2(0, 190), new Vector2(700, 50),
-            "SELECT MOVE", 32, TextAlignmentOptions.Center);
-        
-        // Create a scroll view container for moves
-        GameObject scrollContent = new GameObject("MoveButtonContainer");
-        scrollContent.transform.SetParent(movePanel.transform, false);
-        RectTransform scrollRect = scrollContent.AddComponent<RectTransform>();
-        scrollRect.anchoredPosition = new Vector2(0, -10);
-        scrollRect.sizeDelta = new Vector2(700, 350);
-        
-        // Add Vertical Layout Group for automatic positioning
-        VerticalLayoutGroup layoutGroup = scrollContent.AddComponent<VerticalLayoutGroup>();
-        layoutGroup.spacing = 10;
-        layoutGroup.padding = new RectOffset(10, 10, 10, 10);
-        layoutGroup.childAlignment = TextAnchor.UpperCenter;
-        layoutGroup.childControlWidth = true;
-        layoutGroup.childControlHeight = false;
-        layoutGroup.childForceExpandWidth = true;
-        layoutGroup.childForceExpandHeight = false;
-        
-        battleUI.moveButtonContainer = scrollContent.transform;
-        
-        // Keep original action buttons (will be hidden when move system is active)
         battleUI.attackButton = CreateButton("AttackButton", parent, 
             new Vector2(-280, -380), new Vector2(240, 80), "ATTACK", OnAttackButtonSetup);
         
