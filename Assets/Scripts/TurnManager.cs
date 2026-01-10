@@ -62,4 +62,30 @@ public class TurnManager : MonoBehaviour
         }
         return false;
     }
+
+    public Character GetNextCharacter()
+    {
+        if (turnOrder.Count == 0) return null;
+        
+        // Look ahead to find the next alive character
+        int nextIndex = currentTurnIndex + 1;
+        if (nextIndex >= turnOrder.Count)
+        {
+            nextIndex = 0;
+        }
+        
+        // Keep looking until we find an alive character
+        int searchCount = 0;
+        while (!turnOrder[nextIndex].IsAlive() && searchCount < turnOrder.Count)
+        {
+            nextIndex++;
+            if (nextIndex >= turnOrder.Count)
+            {
+                nextIndex = 0;
+            }
+            searchCount++;
+        }
+        
+        return turnOrder[nextIndex].IsAlive() ? turnOrder[nextIndex] : null;
+    }
 }
