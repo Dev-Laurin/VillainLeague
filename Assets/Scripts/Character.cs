@@ -23,9 +23,9 @@ public class Character
         isPlayerCharacter = isPlayer;
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int attackValue)
     {
-        int actualDamage = Mathf.Max(1, damage - defense);
+        int actualDamage = Mathf.Max(1, attackValue - defense);
         currentHP -= actualDamage;
         currentHP = Mathf.Max(0, currentHP);
         Debug.Log($"{characterName} takes {actualDamage} damage! HP: {currentHP}/{maxHP}");

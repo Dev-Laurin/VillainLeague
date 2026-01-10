@@ -47,7 +47,7 @@ VillainLeague/
 
 1. Install Unity Hub and Unity Editor (version 2022.3.10f1 or later)
 2. Open Unity Hub and click "Add" to add this project
-3. Select the `/home/runner/work/VillainLeague/VillainLeague` folder
+3. Select your VillainLeague project folder
 4. Open the project in Unity
 
 ### Playing the Battle

@@ -39,9 +39,9 @@ public class BattleSystemExample : MonoBehaviour
 
         Debug.Log($"Before attack: {defender.characterName} has {defender.currentHP} HP");
         
-        // Attack deals (Attack - Defense) damage, minimum 1
-        int damage = attacker.attack;
-        defender.TakeDamage(damage);
+        // Attack: Pass attacker's attack value, defender will calculate damage (Attack - Defense, min 1)
+        int attackValue = attacker.attack;
+        defender.TakeDamage(attackValue);
         
         Debug.Log($"After attack: {defender.characterName} has {defender.currentHP} HP");
     }

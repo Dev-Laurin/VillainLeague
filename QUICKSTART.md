@@ -18,7 +18,7 @@ This is a complete Unity 2D turn-based battle system with:
 2. **Add Project to Unity Hub**
    - Open Unity Hub
    - Click "Add" or "Open"
-   - Navigate to this folder: `/home/runner/work/VillainLeague/VillainLeague`
+   - Navigate to your cloned VillainLeague project folder
    - Select the folder and click "Open"
 
 3. **Open the Project**
