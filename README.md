@@ -1,119 +1,192 @@
----
-description: A copy of the best readme repo
----
+# Villain League - Turn-Based Battle System
 
-# BLANK\_README
+[![MIT License](https://img.shields.io/github/license/Dev-Laurin/VillainLeague.svg?style=for-the-badge)](https://github.com/Dev-Laurin/VillainLeague/blob/main/LICENSE.txt)
 
-[![Contributors](https://img.shields.io/github/contributors/github\_username/repo\_name.svg?style=for-the-badge)](https://github.com/github\_username/repo\_name/graphs/contributors) [![Forks](https://img.shields.io/github/forks/github\_username/repo\_name.svg?style=for-the-badge)](https://github.com/github\_username/repo\_name/network/members) [![Stargazers](https://img.shields.io/github/stars/github\_username/repo\_name.svg?style=for-the-badge)](https://github.com/github\_username/repo\_name/stargazers) [![Issues](https://img.shields.io/github/issues/github\_username/repo\_name.svg?style=for-the-badge)](https://github.com/github\_username/repo\_name/issues) [![MIT License](https://img.shields.io/github/license/github\_username/repo\_name.svg?style=for-the-badge)](https://github.com/github\_username/repo\_name/blob/master/LICENSE.txt) [![LinkedIn](https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge\&logo=linkedin\&colorB=555)](https://linkedin.com/in/linkedin\_username)
+A 2D Unity turn-based battle system inspired by the Mario & Luigi series, featuring squad-based combat with 2 heroes vs 2 villains.
 
-\
-[![Logo](images/logo.png)](https://github.com/github\_username/repo\_name)
+**[Explore the docs »](PROJECT_OVERVIEW.md)** | **[Quick Start](QUICKSTART.md)** | **[Report Bug](https://github.com/Dev-Laurin/VillainLeague/issues)**
 
-#### project\_title
+## About The Project
 
-project\_description\
-[**Explore the docs »**](https://github.com/github\_username/repo\_name)\
-\
-[View Demo](https://github.com/github\_username/repo\_name) · [Report Bug](https://github.com/github\_username/repo\_name/issues) · [Request Feature](https://github.com/github\_username/repo\_name/issues)
+Villain League is a 2D Unity turn-based battle system that brings classic RPG combat mechanics to life. Control a squad of 2 heroes as they battle against 2 villains in strategic turn-based combat inspired by the beloved Mario & Luigi series.
 
-<details>
+### ✨ Key Features
 
-<summary>Table of Contents</summary>
+- **Turn-Based Combat**: Classic RPG-style turn-based battle system
+- **Squad-Based**: Control 2 heroes in your party
+- **Multiple Actions**: Attack, Defend, and Special moves
+- **Strategic Gameplay**: Choose your actions wisely to defeat enemies
+- **HP Management**: Real-time health tracking with damage calculation
+- **Enemy AI**: Face intelligent villains with tactical behavior
+- **Clean Architecture**: Well-structured, modular code for easy extension
 
-1. [About The Project](./#about-the-project)
-   * [Built With](./#built-with)
-2. [Getting Started](./#getting-started)
-   * [Prerequisites](./#prerequisites)
-   * [Installation](./#installation)
-3. [Usage](./#usage)
-4. [Roadmap](./#roadmap)
-5. [Contributing](./#contributing)
-6. [License](./#license)
-7. [Contact](./#contact)
-8. [Acknowledgments](./#acknowledgments)
+### 🎮 Gameplay
 
-</details>
+- **2 Player Characters**: Hero 1 (100 HP, 15 ATK, 5 DEF) and Hero 2 (80 HP, 20 ATK, 3 DEF)
+- **2 Enemy Characters**: Villain 1 (70 HP, 12 ATK, 4 DEF) and Villain 2 (90 HP, 10 ATK, 6 DEF)
+- **Battle Actions**: 
+  - Attack: Normal damage attack
+  - Defend: Defensive stance
+  - Special: Powerful 2x damage attack
+- **Win Condition**: Defeat all enemies
+- **Lose Condition**: All heroes defeated
 
-### About The Project
+([back to top](#villain-league---turn-based-battle-system))
 
-[![Product Name Screen Shot](images/screenshot.png)](https://example.com)
+### Built With
 
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
+* [Unity](https://unity.com/) - Game Engine (2022.3.10f1)
+* [C#](https://docs.microsoft.com/en-us/dotnet/csharp/) - Programming Language
+* [TextMeshPro](https://docs.unity3d.com/Packages/com.unity.textmeshpro@3.0/manual/index.html) - UI Text System
 
-([back to top](./#top))
+([back to top](#villain-league---turn-based-battle-system))
 
-#### Built With
+## Getting Started
 
-* [Next.js](https://nextjs.org/)
-* [React.js](https://reactjs.org/)
-* [Vue.js](https://vuejs.org/)
-* [Angular](https://angular.io/)
-* [Svelte](https://svelte.dev/)
-* [Laravel](https://laravel.com)
-* [Bootstrap](https://getbootstrap.com)
-* [JQuery](https://jquery.com)
+Follow these steps to get the battle system up and running on your machine.
 
-([back to top](./#top))
+### Prerequisites
 
-### Getting Started
+Before you begin, ensure you have:
 
-This is an example of how you may give instructions on setting up your project locally. To get a local copy up and running follow these simple example steps.
+* **Unity Hub** - Download from [unity.com/download](https://unity.com/download)
+* **Unity Editor** - Version 2022.3.10f1 or later (LTS version recommended)
+  ```
+  Install via Unity Hub > Installs > Add
+  Select Unity 2022.3.10f1 or later
+  ```
 
-#### Prerequisites
+### Installation
 
-This is an example of how to list things you need to use the software and how to install them.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Dev-Laurin/VillainLeague.git
+   ```
 
-*   npm
+2. **Open Unity Hub**
+   - Click "Add" or "Open"
+   - Navigate to the cloned repository folder
+   - Select the folder and click "Open"
 
-    ```
-    npm install npm@latest -g
-    ```
+3. **Open the Project in Unity**
+   - Click on "VillainLeague" in Unity Hub
+   - Wait for Unity to import all assets (first time may take a few minutes)
 
-#### Installation
+4. **Import TextMeshPro**
+   - When prompted, click "Import TMP Essentials"
+   - This is required for UI text display
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2.  Clone the repo
+5. **Open the Battle Scene**
+   - In Unity Project window, navigate to `Assets/Scenes`
+   - Double-click `BattleScene.unity`
 
-    ```
-    git clone https://github.com/github_username/repo_name.git
-    ```
-3.  Install NPM packages
+6. **Complete UI Setup** (See [QUICKSTART.md](QUICKSTART.md) for detailed UI setup)
+   - Create Canvas and UI elements
+   - Wire up UI components to BattleUI script
+   - Save the scene
 
-    ```
-    npm install
-    ```
-4.  Enter your API in `config.js`
+7. **Play!**
+   - Press the Play button in Unity Editor
+   - Experience the turn-based battle system
 
-    ```js
-    const API_KEY = 'ENTER YOUR API';
-    ```
+For detailed setup instructions, see **[QUICKSTART.md](QUICKSTART.md)**
 
-([back to top](./#top))
+([back to top](#villain-league---turn-based-battle-system))
 
-### Usage
+## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+### Playing the Game
 
-_For more examples, please refer to the_ [_Documentation_](https://example.com)
+1. Open `BattleScene.unity` in Unity Editor
+2. Press the **Play** button
+3. The battle begins automatically with your squad vs the villain squad
 
-([back to top](./#top))
+### During Battle
 
-### Roadmap
+**Your Turn:**
+- Click **Attack** to perform a normal attack on an enemy
+- Click **Defend** to take a defensive stance
+- Click **Special** to perform a powerful 2x damage attack
+- Select your target when prompted
 
-* [ ] Feature 1
-* [ ] Feature 2
-* [ ] Feature 3
-  * [ ] Nested Feature
+**Enemy Turn:**
+- Enemies automatically attack your squad
+- Watch as damage is calculated and HP bars update
 
-See the [open issues](https://github.com/github\_username/repo\_name/issues) for a full list of proposed features (and known issues).
+**Victory/Defeat:**
+- Win by defeating all enemies
+- Lose if all your heroes fall
 
-([back to top](./#top))
+### Example Screenshots
 
-### Contributing
+*(Screenshots would be added here after UI implementation)*
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+### Code Examples
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement". Don't forget to give the project a star! Thanks again!
+See `Assets/Scripts/BattleSystemExample.cs` for code examples:
+
+```csharp
+// Create a custom character
+Character hero = new Character("Warrior", 120, 18, 7, true);
+
+// Deal damage
+hero.TakeDamage(25);
+
+// Heal character
+hero.Heal(15);
+
+// Check if alive
+if (hero.IsAlive()) {
+    Debug.Log("Hero is still fighting!");
+}
+```
+
+For more detailed documentation, see [BATTLE_SYSTEM_README.md](BATTLE_SYSTEM_README.md)
+
+([back to top](#villain-league---turn-based-battle-system))
+
+## Roadmap
+
+### Completed ✅
+- [x] Unity 2D project setup
+- [x] Core battle system architecture
+- [x] Character system with stats (HP, Attack, Defense)
+- [x] Turn-based mechanics
+- [x] Action system (Attack, Defend, Special)
+- [x] Target selection system
+- [x] Damage calculation
+- [x] Turn order management
+- [x] Win/Lose conditions
+- [x] Battle scene setup
+- [x] Comprehensive documentation
+
+### Future Enhancements 🔮
+- [ ] Complete UI implementation with visual designs
+- [ ] Character sprites and animations
+- [ ] Sound effects and music
+- [ ] Particle effects for attacks
+- [ ] Status effects (poison, stun, burn)
+- [ ] Item system
+- [ ] Experience and leveling
+- [ ] Multiple battle scenarios
+- [ ] Save/Load system
+- [ ] Enhanced enemy AI
+- [ ] Combo attacks
+- [ ] Equipment system
+- [ ] Main menu
+- [ ] Victory/defeat screens
+
+See the [open issues](https://github.com/Dev-Laurin/VillainLeague/issues) for a full list of proposed features and known issues.
+
+([back to top](#villain-league---turn-based-battle-system))
+
+## Contributing
+
+Contributions make the open source community an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**!
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+
+### How to Contribute
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -121,26 +194,41 @@ If you have a suggestion that would make this better, please fork the repo and c
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-([back to top](./#top))
+### Areas for Contribution
 
-### License
+- **UI Design**: Create beautiful battle UI layouts
+- **Art**: Character sprites, animations, effects
+- **Audio**: Sound effects, background music
+- **Features**: New battle mechanics, items, skills
+- **Documentation**: Tutorials, guides, examples
+- **Bug Fixes**: Report and fix bugs
+
+([back to top](#villain-league---turn-based-battle-system))
+
+## License
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
-([back to top](./#top))
+([back to top](#villain-league---turn-based-battle-system))
 
-### Contact
+## Contact
 
-Your Name - [@twitter\_handle](https://twitter.com/twitter\_handle) - email@email\_client.com
+Project Link: [https://github.com/Dev-Laurin/VillainLeague](https://github.com/Dev-Laurin/VillainLeague)
 
-Project Link: [https://github.com/github\_username/repo\_name](https://github.com/github\_username/repo\_name)
+([back to top](#villain-league---turn-based-battle-system))
 
-([back to top](./#top))
+## Acknowledgments
 
-### Acknowledgments
+* Inspired by the **Mario & Luigi** series turn-based battle system
+* Built with [Unity Game Engine](https://unity.com/)
+* Uses [TextMeshPro](https://docs.unity3d.com/Packages/com.unity.textmeshpro@3.0/manual/index.html) for text rendering
+* Thanks to the Unity community for excellent resources and support
 
-*
-*
-*
+([back to top](#villain-league---turn-based-battle-system))
 
-([back to top](./#top))
+## Documentation
+
+- **[PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md)** - Comprehensive project overview
+- **[QUICKSTART.md](QUICKSTART.md)** - Quick start guide for new users
+- **[BATTLE_SYSTEM_README.md](BATTLE_SYSTEM_README.md)** - Detailed technical documentation
+- **[Assets/Scripts/](Assets/Scripts/)** - Well-commented source code
