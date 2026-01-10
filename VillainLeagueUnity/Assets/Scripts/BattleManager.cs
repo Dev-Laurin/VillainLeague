@@ -47,9 +47,9 @@ public class BattleManager : MonoBehaviour
         cecelia.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Cecelia Sylvan"));
         playerSquad.Add(cecelia);
         
-        Character hero2 = new Character("Hero 2", 80, 20, 3, true);
-        hero2.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Hero 2"));
-        playerSquad.Add(hero2);
+        Character naice = new Character("Naice Ajimi", 80, 20, 3, true);
+        naice.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Naice Ajimi"));
+        playerSquad.Add(naice);
 
         // Initialize enemy squad with 2 characters
         Character villain1 = new Character("Villain 1", 70, 12, 4, false);

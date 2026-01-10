@@ -1,0 +1,144 @@
+{
+  "characterName": "Naice Ajimi",
+  "role": "Trickster / Disruptor / Battlefield Control",
+  "resource": {
+    "name": "Style",
+    "max": 6,
+    "regenPerTurn": 1
+  },
+  "moves": [
+    {
+      "id": "naice_basic_feint",
+      "name": "Feinting Strike",
+      "description": "Deal light damage. If the target is affected by a debuff, gain Style.",
+      "type": "physical",
+      "styleCost": 0,
+      "damage": 3,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "naice_vanish",
+      "name": "Now You See Me",
+      "description": "Become Invisible for 1 turn. Gain Evasion and cannot be targeted directly.",
+      "type": "magic",
+      "styleCost": 1,
+      "evasion": 3,
+      "durationTurns": 1,
+      "targetType": "Self"
+    },
+    {
+      "id": "naice_reappear_strike",
+      "name": "Now You Don't",
+      "description": "Break invisibility to deal bonus damage. Always crits if used from Invisible.",
+      "type": "magic",
+      "styleCost": 1,
+      "damage": 5,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "naice_smoke_and_mirrors",
+      "name": "Smoke & Mirrors",
+      "description": "Summon an illusion that draws enemy attacks for 1 turn.",
+      "type": "magic",
+      "styleCost": 2,
+      "armor": 5,
+      "durationTurns": 1,
+      "targetType": "Self"
+    },
+    {
+      "id": "naice_pocket_trick",
+      "name": "Pocket Surprise",
+      "description": "Pull a hidden item from Naice's coat. Random effect.",
+      "type": "magic",
+      "styleCost": 1,
+      "damage": 4,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "naice_blind",
+      "name": "Pocket Sand",
+      "description": "Blind a target, reducing accuracy for 2 turns.",
+      "type": "magic",
+      "styleCost": 1,
+      "defenseDebuff": 3,
+      "durationTurns": 2,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "naice_mockery",
+      "name": "Cutting Remark",
+      "description": "Insult an enemy, lowering Attack and increasing chance they target Naice.",
+      "type": "magic",
+      "styleCost": 1,
+      "attackDebuff": 2,
+      "durationTurns": 2,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "naice_stage_shift",
+      "name": "Change the Stage",
+      "description": "Swap positions of any two units on the battlefield.",
+      "type": "magic",
+      "styleCost": 2,
+      "moveRange": 6,
+      "targetType": "SingleAlly"
+    },
+    {
+      "id": "naice_false_opening",
+      "name": "False Opening",
+      "description": "Enemy is tricked into attacking Naice; if they miss, they are Stunned.",
+      "type": "magic",
+      "styleCost": 2,
+      "durationTurns": 1,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "naice_applause",
+      "name": "Take a Bow",
+      "description": "Recover Style and grant allies minor buffs if Naice avoided damage last turn.",
+      "type": "physical",
+      "styleCost": 0,
+      "attackBuff": 1,
+      "evasion": 1,
+      "radius": 2,
+      "targetType": "AllAllies"
+    },
+    {
+      "id": "naice_escape_artist",
+      "name": "Escape Artist",
+      "description": "Remove all control effects from self and teleport to a safe tile.",
+      "type": "magic",
+      "styleCost": 2,
+      "moveRange": 6,
+      "targetType": "Self"
+    },
+    {
+      "id": "naice_grand_distraction",
+      "name": "Grand Distraction",
+      "description": "All enemies suffer Accuracy down and Attack down for 2 turns.",
+      "type": "magic",
+      "styleCost": 3,
+      "attackDebuff": 2,
+      "defenseDebuff": 2,
+      "durationTurns": 2,
+      "targetType": "AllEnemies"
+    },
+    {
+      "id": "naice_steal_turn",
+      "name": "Sleight of Time",
+      "description": "Delay target's next action and give Naice a bonus turn.",
+      "type": "magic",
+      "styleCost": 3,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "naice_ultimate",
+      "name": "Final Act",
+      "description": "Ultimate: Create multiple illusions, vanish, then reappear dealing damage to all enemies. Gain Style for each enemy affected.",
+      "type": "magic",
+      "styleCost": 5,
+      "damage": 5,
+      "targetType": "AllEnemies"
+    }
+  ]
+}

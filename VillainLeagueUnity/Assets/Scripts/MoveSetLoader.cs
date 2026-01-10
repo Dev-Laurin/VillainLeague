@@ -12,7 +12,8 @@ public class MoveData
     public string name;
     public string description;
     public string type; // "physical" or "magic"
-    public int manaCost; // Only for magic attacks
+    public int manaCost; // Resource cost (generic, can be mana, style, etc.)
+    public int styleCost; // Alias for resource cost (for Style-based characters)
     public int damage;
     public int hits = 1;
     public int healing;
@@ -107,9 +108,10 @@ public static class MoveSetLoader
         // Convert each move
         foreach (MoveData moveData in data.moves)
         {
-            // Physical attacks cost 0 mana, magic attacks cost mana
+            // Physical attacks cost 0, magic/ability attacks cost resources
             bool isPhysical = (moveData.type == "physical");
-            int cost = isPhysical ? 0 : moveData.manaCost;
+            // Support both manaCost and styleCost fields (use whichever is non-zero)
+            int cost = isPhysical ? 0 : Mathf.Max(moveData.manaCost, moveData.styleCost);
             
             Move move = new Move(moveData.id, moveData.name, moveData.description, cost);
             move.isPhysical = isPhysical;
