@@ -1,0 +1,39 @@
+{
+  "characterName": "Villain 1",
+  "role": "Dark Knight",
+  "resource": {
+    "name": "Mana",
+    "max": 8,
+    "regenPerTurn": 1
+  },
+  "moves": [
+    {
+      "id": "slash",
+      "name": "Slash",
+      "description": "A basic physical slash.",
+      "type": "physical",
+      "manaCost": 0,
+      "damage": 4,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "dark_bolt",
+      "name": "Dark Bolt",
+      "description": "A dark magic projectile.",
+      "type": "magic",
+      "manaCost": 3,
+      "damage": 7,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "shadow_strike",
+      "name": "Shadow Strike",
+      "description": "A powerful magic-infused strike.",
+      "type": "magic",
+      "manaCost": 5,
+      "damage": 10,
+      "ignoreGuard": true,
+      "targetType": "SingleEnemy"
+    }
+  ]
+}
