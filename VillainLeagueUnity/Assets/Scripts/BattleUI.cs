@@ -36,6 +36,10 @@ public class BattleUI : MonoBehaviour
     public Button attackButton;
     public Button defendButton;
     public Button specialButton;
+    
+    [Header("Super Buttons")]
+    public Button superButton;
+    public Button teamSuperButton;
 
     [Header("Move Selection")]
     public GameObject moveSelectionPanel;
@@ -53,6 +57,10 @@ public class BattleUI : MonoBehaviour
             targetSelectionPanel.SetActive(false);
         if (moveSelectionPanel != null)
             moveSelectionPanel.SetActive(false);
+        if (superButton != null)
+            superButton.gameObject.SetActive(false);
+        if (teamSuperButton != null)
+            teamSuperButton.gameObject.SetActive(false);
     }
 
     public void UpdateCharacterUI(Character character, int index)
@@ -165,7 +173,15 @@ public class BattleUI : MonoBehaviour
             moveSelectionPanel.SetActive(show);
     }
     
-    public void DisplayMoves(List<Move> moves, CharacterResource resource, System.Action<Move> onMoveSelected)
+    public void SetSuperButtonsActive(bool superReady, bool teamSuperReady)
+    {
+        if (superButton != null)
+            superButton.gameObject.SetActive(superReady);
+        if (teamSuperButton != null)
+            teamSuperButton.gameObject.SetActive(teamSuperReady);
+    }
+    
+    public void DisplayMoves(List<Move> moves, CharacterResource resource, CharacterResource secondaryResource, bool showOnlySupers, System.Action<Move> onMoveSelected)
     {
         // Clear existing move buttons
         foreach (Button btn in moveButtons)
@@ -177,10 +193,24 @@ public class BattleUI : MonoBehaviour
         
         if (moveButtonContainer == null || moves == null) return;
         
-        // Create a button for each move
-        for (int i = 0; i < moves.Count; i++)
+        // Filter moves based on showOnlySupers flag
+        List<Move> filteredMoves = new List<Move>();
+        foreach (Move move in moves)
         {
-            Move move = moves[i];
+            if (showOnlySupers && move.isSuper)
+            {
+                filteredMoves.Add(move);
+            }
+            else if (!showOnlySupers && !move.isSuper)
+            {
+                filteredMoves.Add(move);
+            }
+        }
+        
+        // Create a button for each move
+        for (int i = 0; i < filteredMoves.Count; i++)
+        {
+            Move move = filteredMoves[i];
             GameObject buttonObj = new GameObject($"MoveButton_{i}");
             buttonObj.transform.SetParent(moveButtonContainer, false);
             
@@ -190,8 +220,14 @@ public class BattleUI : MonoBehaviour
             Image image = buttonObj.AddComponent<Image>();
             Button button = buttonObj.AddComponent<Button>();
             
-            // Check if move can be afforded
-            bool canAfford = resource == null || resource.CanAfford(move.resourceCost);
+            // Check if move can be afforded (both primary and secondary resources)
+            bool canAffordPrimary = resource == null || resource.CanAfford(move.resourceCost);
+            bool canAffordSecondary = true;
+            if (move.secondaryResourceCost > 0 && secondaryResource != null)
+            {
+                canAffordSecondary = secondaryResource.CanAfford(move.secondaryResourceCost);
+            }
+            bool canAfford = canAffordPrimary && canAffordSecondary;
             
             if (canAfford)
             {
