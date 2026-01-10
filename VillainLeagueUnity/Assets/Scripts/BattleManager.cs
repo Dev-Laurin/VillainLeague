@@ -43,9 +43,11 @@ public class BattleManager : MonoBehaviour
     void SetupBattle()
     {
         // Initialize player squad with 2 characters
-        Character cecelia = new Character("Cecelia Sylvan", 100, 15, 5, true);
-        cecelia.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Cecelia Sylvan"));
-        playerSquad.Add(cecelia);
+        Character bellinor = new Character("Bellinor Chabbeneoux", 120, 18, 6, true);
+        bellinor.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Bellinor Chabbeneoux"));
+        // Initialize Resolve as a secondary resource for Bellinor (gained when taking damage or protecting allies)
+        bellinor.secondaryResource = new CharacterResource("Resolve", 6, 0); // Max 6, no auto-regen (gained through combat)
+        playerSquad.Add(bellinor);
         
         Character naice = new Character("Naice Ajimi", 80, 20, 3, true);
         naice.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Naice Ajimi"));
