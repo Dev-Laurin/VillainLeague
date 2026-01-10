@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 using System.Collections.Generic;
 
 public class BattleUI : MonoBehaviour
@@ -338,7 +339,7 @@ public class BattleUI : MonoBehaviour
     /// <summary>
     /// Coroutine that auto-dismisses the banter dialogue after duration
     /// </summary>
-    private System.Collections.IEnumerator AutoDismissBanter(float duration)
+    private IEnumerator AutoDismissBanter(float duration)
     {
         yield return new WaitForSeconds(duration);
         
