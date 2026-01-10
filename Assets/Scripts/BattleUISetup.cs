@@ -30,6 +30,14 @@ public class BattleUISetup : MonoBehaviour
         
         canvasObj.AddComponent<GraphicRaycaster>();
 
+        // Create EventSystem if it doesn't exist
+        if (FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)
+        {
+            GameObject eventSystemObj = new GameObject("EventSystem");
+            eventSystemObj.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            eventSystemObj.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+        }
+
         // Create BattleUI component on this GameObject
         battleUI = gameObject.AddComponent<BattleUI>();
 
