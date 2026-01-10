@@ -12,7 +12,13 @@ public class Character
     
     public Sprite characterSprite;
     public GameObject characterObject;
-
+    
+    // Moveset system
+    public CharacterMoveSet moveSet;
+    
+    // Secondary resource (e.g., Style for Naice Ajimi)
+    public CharacterResource secondaryResource;
+    
     public Character(string name, int hp, int atk, int def, bool isPlayer)
     {
         characterName = name;
@@ -21,6 +27,15 @@ public class Character
         attack = atk;
         defense = def;
         isPlayerCharacter = isPlayer;
+    }
+    
+    public void SetMoveSet(CharacterMoveSet moveSet)
+    {
+        this.moveSet = moveSet;
+        if (moveSet != null && moveSet.resource != null)
+        {
+            moveSet.InitializeResource();
+        }
     }
 
     public void TakeDamage(int attackValue)

@@ -1,0 +1,116 @@
+{
+  "characterName": "Cecelia Sylvan",
+  "role": "Mobile swordswoman / skirmisher / protector",
+  "resource": {
+    "name": "Mana",
+    "max": 12,
+    "regenPerTurn": 2
+  },
+  "moves": [
+    {
+      "id": "cece_basic_slash",
+      "name": "Twin Slash",
+      "description": "Deal physical damage with a quick two-hit sword combo.",
+      "type": "physical",
+      "manaCost": 0,
+      "damage": 3,
+      "hits": 2,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "cece_teleport_strike",
+      "name": "Blink Strike",
+      "description": "Teleport to a target and strike. Ignores Guard/Block effects on the target this hit.",
+      "type": "magic",
+      "manaCost": 4,
+      "damage": 5,
+      "ignoreGuard": true,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "cece_reposition",
+      "name": "Flash Step",
+      "description": "Teleport to any empty tile within range. Gain Evasion for 1 turn.",
+      "type": "magic",
+      "manaCost": 2,
+      "moveRange": 5,
+      "evasion": 2,
+      "durationTurns": 1,
+      "targetType": "Self"
+    },
+    {
+      "id": "cece_guard_swap",
+      "name": "Hero's Intercept",
+      "description": "Teleport to an ally and take the next hit meant for them. Gain temporary Armor for 1 turn.",
+      "type": "magic",
+      "manaCost": 4,
+      "armor": 3,
+      "durationTurns": 1,
+      "targetType": "SingleAlly"
+    },
+    {
+      "id": "cece_rally",
+      "name": "Rally Heart",
+      "description": "Inspire allies in a small area, increasing their Attack for 2 turns.",
+      "type": "magic",
+      "manaCost": 4,
+      "attackBuff": 2,
+      "radius": 2,
+      "durationTurns": 2,
+      "targetType": "AllAllies"
+    },
+    {
+      "id": "cece_precision_cut",
+      "name": "Severing Cut",
+      "description": "Deal damage and apply Bleed (damage over time).",
+      "type": "physical",
+      "manaCost": 0,
+      "damage": 4,
+      "bleed": 2,
+      "durationTurns": 2,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "cece_disarm",
+      "name": "Swordbind",
+      "description": "Deal light damage and reduce target Attack for 2 turns.",
+      "type": "physical",
+      "manaCost": 0,
+      "damage": 2,
+      "attackDebuff": 2,
+      "durationTurns": 2,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "cece_piercing_lunge",
+      "name": "Piercing Lunge",
+      "description": "Deal damage that partially ignores Armor.",
+      "type": "magic",
+      "manaCost": 4,
+      "damage": 5,
+      "armorPierce": 2,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "cece_blade_whirl",
+      "name": "Blade Whirl",
+      "description": "Spin attack that hits all enemies adjacent to Cecelia.",
+      "type": "magic",
+      "manaCost": 4,
+      "damage": 3,
+      "radius": 1,
+      "targetType": "AllEnemies"
+    },
+    {
+      "id": "cece_afterimage",
+      "name": "Afterimage",
+      "description": "Gain Evasion and Counter for 1 turn.",
+      "type": "magic",
+      "manaCost": 4,
+      "evasion": 2,
+      "counterDamage": 3,
+      "durationTurns": 1,
+      "targetType": "Self"
+    }
+  ]
+}
