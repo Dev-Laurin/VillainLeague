@@ -44,20 +44,20 @@ public class BattleManager : MonoBehaviour
     {
         // Initialize player squad with 2 characters
         Character cecelia = new Character("Cecelia Sylvan", 100, 15, 5, true);
-        cecelia.SetMoveSet(MoveSetFactory.CreateCeceliaSylvanMoveSet());
+        cecelia.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Cecelia Sylvan"));
         playerSquad.Add(cecelia);
         
         Character hero2 = new Character("Hero 2", 80, 20, 3, true);
-        hero2.SetMoveSet(MoveSetFactory.CreateDefaultMoveSet("Hero 2"));
+        hero2.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Hero 2"));
         playerSquad.Add(hero2);
 
         // Initialize enemy squad with 2 characters
         Character villain1 = new Character("Villain 1", 70, 12, 4, false);
-        villain1.SetMoveSet(MoveSetFactory.CreateDefaultMoveSet("Villain 1"));
+        villain1.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Villain 1"));
         enemySquad.Add(villain1);
         
         Character villain2 = new Character("Villain 2", 90, 10, 6, false);
-        villain2.SetMoveSet(MoveSetFactory.CreateDefaultMoveSet("Villain 2"));
+        villain2.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Villain 2"));
         enemySquad.Add(villain2);
 
         // Setup turn order

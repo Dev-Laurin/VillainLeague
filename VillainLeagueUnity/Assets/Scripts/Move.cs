@@ -8,6 +8,7 @@ public class Move
     public string moveName;
     public string description;
     public int resourceCost;
+    public bool isPhysical; // True for physical attacks (no mana cost), false for magic
     
     // Damage and effect values
     public int damage;

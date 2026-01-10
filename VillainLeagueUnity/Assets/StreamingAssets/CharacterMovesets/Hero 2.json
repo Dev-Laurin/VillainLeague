@@ -1,0 +1,47 @@
+{
+  "characterName": "Hero 2",
+  "role": "Warrior",
+  "resource": {
+    "name": "Mana",
+    "max": 10,
+    "regenPerTurn": 2
+  },
+  "moves": [
+    {
+      "id": "basic_attack",
+      "name": "Basic Attack",
+      "description": "A simple physical attack.",
+      "type": "physical",
+      "manaCost": 0,
+      "damage": 5,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "power_strike",
+      "name": "Power Strike",
+      "description": "A powerful physical strike.",
+      "type": "physical",
+      "manaCost": 0,
+      "damage": 8,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "magic_blast",
+      "name": "Magic Blast",
+      "description": "A magical attack that costs mana.",
+      "type": "magic",
+      "manaCost": 3,
+      "damage": 10,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "heal",
+      "name": "Heal",
+      "description": "Restore health using magic.",
+      "type": "magic",
+      "manaCost": 4,
+      "healing": 15,
+      "targetType": "Self"
+    }
+  ]
+}

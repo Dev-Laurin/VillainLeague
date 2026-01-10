@@ -217,7 +217,15 @@ public class BattleUI : MonoBehaviour
             costRect.sizeDelta = Vector2.zero;
             
             TextMeshProUGUI costText = costTextObj.AddComponent<TextMeshProUGUI>();
-            costText.text = $"Cost: {move.resourceCost}";
+            // Display "Physical" for physical attacks, mana cost for magic
+            if (move.isPhysical || move.resourceCost == 0)
+            {
+                costText.text = "Physical";
+            }
+            else
+            {
+                costText.text = $"Mana: {move.resourceCost}";
+            }
             costText.fontSize = 20;
             costText.alignment = TextAlignmentOptions.Right;
             costText.margin = new Vector4(0, 0, 10, 0);
