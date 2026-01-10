@@ -27,6 +27,7 @@ public class MoveData
     public int armorPierce;
     public int bleed;
     public int counterDamage;
+    public int styleGain; // Secondary resource gain
     public int radius;
     public int moveRange;
     public int durationTurns = 1;
@@ -128,6 +129,7 @@ public static class MoveSetLoader
             move.armorPierce = moveData.armorPierce;
             move.bleed = moveData.bleed;
             move.counterDamage = moveData.counterDamage;
+            move.styleGain = moveData.styleGain;
             move.radius = moveData.radius;
             move.moveRange = moveData.moveRange;
             move.durationTurns = moveData.durationTurns;

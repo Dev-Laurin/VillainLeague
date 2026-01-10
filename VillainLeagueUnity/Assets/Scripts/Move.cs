@@ -29,6 +29,9 @@ public class Move
     public int bleed;
     public int counterDamage;
     
+    // Secondary resource gain (e.g., Style)
+    public int styleGain;
+    
     // Area of effect
     public int radius;
     public int moveRange;

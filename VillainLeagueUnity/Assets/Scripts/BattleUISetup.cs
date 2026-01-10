@@ -79,24 +79,28 @@ public class BattleUISetup : MonoBehaviour
     void SetupPlayerUI(Transform parent)
     {
         // Player Panel Background
-        GameObject playerPanel = CreatePanel("PlayerPanel", parent, new Vector2(-600, 250), new Vector2(400, 350));
+        GameObject playerPanel = CreatePanel("PlayerPanel", parent, new Vector2(-600, 250), new Vector2(400, 400));
         
-        // Hero 1
+        // Hero 1 (Cecelia)
         battleUI.player1NameText = CreateText("Player1Name", playerPanel.transform, 
-            new Vector2(0, 130), new Vector2(380, 50), "Hero 1", 32, TextAlignmentOptions.Left);
+            new Vector2(0, 160), new Vector2(380, 50), "Hero 1", 32, TextAlignmentOptions.Left);
         battleUI.player1NameText.color = new Color(0.2f, 0.8f, 0.2f);
         
         battleUI.player1HPText = CreateText("Player1HP", playerPanel.transform, 
-            new Vector2(0, 90), new Vector2(380, 40), "100/100", 24, TextAlignmentOptions.Left);
+            new Vector2(0, 120), new Vector2(380, 40), "100/100", 24, TextAlignmentOptions.Left);
         
         battleUI.player1HPBar = CreateSlider("Player1HPBar", playerPanel.transform, 
-            new Vector2(0, 50), new Vector2(380, 30), 100, 100, new Color(0.2f, 0.8f, 0.2f));
+            new Vector2(0, 80), new Vector2(380, 30), 100, 100, new Color(0.2f, 0.8f, 0.2f));
         
         battleUI.player1ResourceText = CreateText("Player1Resource", playerPanel.transform,
-            new Vector2(0, 15), new Vector2(380, 30), "Focus: 6/6", 20, TextAlignmentOptions.Left);
+            new Vector2(0, 45), new Vector2(380, 30), "Mana: 12/12", 20, TextAlignmentOptions.Left);
         battleUI.player1ResourceText.color = new Color(0.7f, 0.9f, 1f);
+        
+        battleUI.player1SecondaryResourceText = CreateText("Player1SecondaryResource", playerPanel.transform,
+            new Vector2(0, 15), new Vector2(380, 30), "", 18, TextAlignmentOptions.Left);
+        battleUI.player1SecondaryResourceText.color = new Color(1f, 0.8f, 0.3f);
 
-        // Hero 2
+        // Hero 2 (Naice)
         battleUI.player2NameText = CreateText("Player2Name", playerPanel.transform, 
             new Vector2(0, -40), new Vector2(380, 50), "Hero 2", 32, TextAlignmentOptions.Left);
         battleUI.player2NameText.color = new Color(0.2f, 0.8f, 0.2f);
@@ -108,8 +112,12 @@ public class BattleUISetup : MonoBehaviour
             new Vector2(0, -120), new Vector2(380, 30), 80, 80, new Color(0.2f, 0.8f, 0.2f));
         
         battleUI.player2ResourceText = CreateText("Player2Resource", playerPanel.transform,
-            new Vector2(0, -155), new Vector2(380, 30), "Energy: 10/10", 20, TextAlignmentOptions.Left);
+            new Vector2(0, -155), new Vector2(380, 30), "Mana: 10/10", 20, TextAlignmentOptions.Left);
         battleUI.player2ResourceText.color = new Color(0.7f, 0.9f, 1f);
+        
+        battleUI.player2SecondaryResourceText = CreateText("Player2SecondaryResource", playerPanel.transform,
+            new Vector2(0, -185), new Vector2(380, 30), "Style: 0/6", 18, TextAlignmentOptions.Left);
+        battleUI.player2SecondaryResourceText.color = new Color(1f, 0.8f, 0.3f);
     }
 
     void SetupEnemyUI(Transform parent)

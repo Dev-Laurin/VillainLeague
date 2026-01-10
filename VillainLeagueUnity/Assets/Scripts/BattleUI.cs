@@ -10,11 +10,13 @@ public class BattleUI : MonoBehaviour
     public TextMeshProUGUI player1HPText;
     public Slider player1HPBar;
     public TextMeshProUGUI player1ResourceText;
+    public TextMeshProUGUI player1SecondaryResourceText;
     
     public TextMeshProUGUI player2NameText;
     public TextMeshProUGUI player2HPText;
     public Slider player2HPBar;
     public TextMeshProUGUI player2ResourceText;
+    public TextMeshProUGUI player2SecondaryResourceText;
 
     [Header("Enemy UI")]
     public TextMeshProUGUI enemy1NameText;
@@ -61,6 +63,7 @@ public class BattleUI : MonoBehaviour
         TextMeshProUGUI hpText = null;
         Slider hpBar = null;
         TextMeshProUGUI resourceText = null;
+        TextMeshProUGUI secondaryResourceText = null;
 
         if (character.isPlayerCharacter)
         {
@@ -70,6 +73,7 @@ public class BattleUI : MonoBehaviour
                 hpText = player1HPText;
                 hpBar = player1HPBar;
                 resourceText = player1ResourceText;
+                secondaryResourceText = player1SecondaryResourceText;
             }
             else if (index == 1)
             {
@@ -77,6 +81,7 @@ public class BattleUI : MonoBehaviour
                 hpText = player2HPText;
                 hpBar = player2HPBar;
                 resourceText = player2ResourceText;
+                secondaryResourceText = player2SecondaryResourceText;
             }
         }
         else
@@ -108,6 +113,18 @@ public class BattleUI : MonoBehaviour
         {
             CharacterResource res = character.moveSet.resource;
             resourceText.text = $"{res.resourceName}: {res.currentResource}/{res.maxResource}";
+        }
+        
+        // Update secondary resource display (e.g., Style for Naice)
+        if (secondaryResourceText != null && character.secondaryResource != null)
+        {
+            CharacterResource secRes = character.secondaryResource;
+            secondaryResourceText.text = $"{secRes.resourceName}: {secRes.currentResource}/{secRes.maxResource}";
+        }
+        else if (secondaryResourceText != null)
+        {
+            // Clear text if no secondary resource
+            secondaryResourceText.text = "";
         }
     }
 

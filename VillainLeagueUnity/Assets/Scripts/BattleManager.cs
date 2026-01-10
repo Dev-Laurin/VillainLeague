@@ -49,6 +49,8 @@ public class BattleManager : MonoBehaviour
         
         Character naice = new Character("Naice Ajimi", 80, 20, 3, true);
         naice.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Naice Ajimi"));
+        // Initialize Style as a secondary resource for Naice
+        naice.secondaryResource = new CharacterResource("Style", 6, 0); // Max 6, no auto-regen (gained through moves)
         playerSquad.Add(naice);
 
         // Initialize enemy squad with 2 characters
@@ -335,6 +337,23 @@ public class BattleManager : MonoBehaviour
         else if (move.targetType == MoveTargetType.AllAllies)
         {
             battleUI.ShowMessage($"{caster.characterName} uses {move.moveName} on all allies!");
+        }
+        
+        // Gain secondary resource (Style) if move has styleGain
+        if (move.styleGain > 0 && caster.secondaryResource != null)
+        {
+            int oldStyle = caster.secondaryResource.currentResource;
+            caster.secondaryResource.currentResource = Mathf.Min(
+                caster.secondaryResource.currentResource + move.styleGain,
+                caster.secondaryResource.maxResource
+            );
+            int styleGained = caster.secondaryResource.currentResource - oldStyle;
+            if (styleGained > 0)
+            {
+                battleUI.ShowMessage($"{caster.characterName} gains {styleGained} {caster.secondaryResource.resourceName}!");
+                UpdateAllUI();
+                yield return new WaitForSeconds(0.8f);
+            }
         }
         
         yield return new WaitForSeconds(1.5f);

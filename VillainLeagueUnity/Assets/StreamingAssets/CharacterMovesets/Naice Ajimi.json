@@ -2,9 +2,9 @@
   "characterName": "Naice Ajimi",
   "role": "Trickster / Disruptor / Battlefield Control",
   "resource": {
-    "name": "Style",
-    "max": 6,
-    "regenPerTurn": 1
+    "name": "Mana",
+    "max": 10,
+    "regenPerTurn": 2
   },
   "moves": [
     {
@@ -12,8 +12,9 @@
       "name": "Feinting Strike",
       "description": "Deal light damage. If the target is affected by a debuff, gain Style.",
       "type": "physical",
-      "styleCost": 0,
+      "manaCost": 0,
       "damage": 3,
+      "styleGain": 1,
       "targetType": "SingleEnemy"
     },
     {
@@ -21,7 +22,7 @@
       "name": "Now You See Me",
       "description": "Become Invisible for 1 turn. Gain Evasion and cannot be targeted directly.",
       "type": "magic",
-      "styleCost": 1,
+      "manaCost": 2,
       "evasion": 3,
       "durationTurns": 1,
       "targetType": "Self"
@@ -31,7 +32,7 @@
       "name": "Now You Don't",
       "description": "Break invisibility to deal bonus damage. Always crits if used from Invisible.",
       "type": "magic",
-      "styleCost": 1,
+      "manaCost": 2,
       "damage": 5,
       "targetType": "SingleEnemy"
     },
@@ -40,9 +41,10 @@
       "name": "Smoke & Mirrors",
       "description": "Summon an illusion that draws enemy attacks for 1 turn.",
       "type": "magic",
-      "styleCost": 2,
+      "manaCost": 3,
       "armor": 5,
       "durationTurns": 1,
+      "styleGain": 1,
       "targetType": "Self"
     },
     {
@@ -50,7 +52,7 @@
       "name": "Pocket Surprise",
       "description": "Pull a hidden item from Naice's coat. Random effect.",
       "type": "magic",
-      "styleCost": 1,
+      "manaCost": 2,
       "damage": 4,
       "targetType": "SingleEnemy"
     },
@@ -59,7 +61,7 @@
       "name": "Pocket Sand",
       "description": "Blind a target, reducing accuracy for 2 turns.",
       "type": "magic",
-      "styleCost": 1,
+      "manaCost": 2,
       "defenseDebuff": 3,
       "durationTurns": 2,
       "targetType": "SingleEnemy"
@@ -69,9 +71,10 @@
       "name": "Cutting Remark",
       "description": "Insult an enemy, lowering Attack and increasing chance they target Naice.",
       "type": "magic",
-      "styleCost": 1,
+      "manaCost": 2,
       "attackDebuff": 2,
       "durationTurns": 2,
+      "styleGain": 1,
       "targetType": "SingleEnemy"
     },
     {
@@ -79,7 +82,7 @@
       "name": "Change the Stage",
       "description": "Swap positions of any two units on the battlefield.",
       "type": "magic",
-      "styleCost": 2,
+      "manaCost": 3,
       "moveRange": 6,
       "targetType": "SingleAlly"
     },
@@ -88,8 +91,9 @@
       "name": "False Opening",
       "description": "Enemy is tricked into attacking Naice; if they miss, they are Stunned.",
       "type": "magic",
-      "styleCost": 2,
+      "manaCost": 3,
       "durationTurns": 1,
+      "styleGain": 2,
       "targetType": "SingleEnemy"
     },
     {
@@ -97,10 +101,11 @@
       "name": "Take a Bow",
       "description": "Recover Style and grant allies minor buffs if Naice avoided damage last turn.",
       "type": "physical",
-      "styleCost": 0,
+      "manaCost": 0,
       "attackBuff": 1,
       "evasion": 1,
       "radius": 2,
+      "styleGain": 2,
       "targetType": "AllAllies"
     },
     {
@@ -108,7 +113,7 @@
       "name": "Escape Artist",
       "description": "Remove all control effects from self and teleport to a safe tile.",
       "type": "magic",
-      "styleCost": 2,
+      "manaCost": 3,
       "moveRange": 6,
       "targetType": "Self"
     },
@@ -117,7 +122,7 @@
       "name": "Grand Distraction",
       "description": "All enemies suffer Accuracy down and Attack down for 2 turns.",
       "type": "magic",
-      "styleCost": 3,
+      "manaCost": 4,
       "attackDebuff": 2,
       "defenseDebuff": 2,
       "durationTurns": 2,
@@ -128,7 +133,7 @@
       "name": "Sleight of Time",
       "description": "Delay target's next action and give Naice a bonus turn.",
       "type": "magic",
-      "styleCost": 3,
+      "manaCost": 5,
       "targetType": "SingleEnemy"
     },
     {
@@ -136,8 +141,9 @@
       "name": "Final Act",
       "description": "Ultimate: Create multiple illusions, vanish, then reappear dealing damage to all enemies. Gain Style for each enemy affected.",
       "type": "magic",
-      "styleCost": 5,
+      "manaCost": 6,
       "damage": 5,
+      "styleGain": 3,
       "targetType": "AllEnemies"
     }
   ]
