@@ -24,6 +24,7 @@ public class BattleUI : MonoBehaviour
 
     [Header("Turn Info")]
     public TextMeshProUGUI turnText;
+    public TextMeshProUGUI nextTurnText;
     public TextMeshProUGUI messageText;
 
     [Header("Action Buttons")]
@@ -94,6 +95,12 @@ public class BattleUI : MonoBehaviour
     {
         if (turnText != null)
             turnText.text = $"Turn: {characterName}";
+    }
+
+    public void UpdateNextTurnText(string characterName)
+    {
+        if (nextTurnText != null)
+            nextTurnText.text = $"Next: {characterName}";
     }
 
     public void ShowMessage(string message)

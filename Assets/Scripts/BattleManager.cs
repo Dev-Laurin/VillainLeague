@@ -78,6 +78,13 @@ public class BattleManager : MonoBehaviour
             }
 
             battleUI.UpdateTurnText(currentCharacter.characterName);
+            
+            // Update next turn display
+            Character nextCharacter = turnManager.GetNextCharacter();
+            if (nextCharacter != null)
+            {
+                battleUI.UpdateNextTurnText(nextCharacter.characterName);
+            }
 
             if (currentCharacter.isPlayerCharacter)
             {
