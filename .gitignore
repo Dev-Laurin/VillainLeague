@@ -9,7 +9,7 @@
 
 # Unity Asset Store Tools
 /[Aa]ssets/AssetStoreTools*
-/[Aa]ssets/images/*
+**/[Aa]ssets/images/**
 
 # Visual Studio cache directory
 .vs/
