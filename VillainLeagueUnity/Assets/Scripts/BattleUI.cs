@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 using System.Collections.Generic;
 
 public class BattleUI : MonoBehaviour
@@ -50,6 +51,11 @@ public class BattleUI : MonoBehaviour
     public GameObject targetSelectionPanel;
     public Button target1Button;
     public Button target2Button;
+    
+    [Header("Banter Dialogue")]
+    public GameObject banterDialoguePanel;
+    public TextMeshProUGUI banterDialogueText;
+    private Coroutine banterFadeCoroutine;
 
     private void Start()
     {
@@ -61,6 +67,8 @@ public class BattleUI : MonoBehaviour
             superButton.gameObject.SetActive(false);
         if (teamSuperButton != null)
             teamSuperButton.gameObject.SetActive(false);
+        if (banterDialoguePanel != null)
+            banterDialoguePanel.SetActive(false);
     }
 
     public void UpdateCharacterUI(Character character, int index)
@@ -301,6 +309,43 @@ public class BattleUI : MonoBehaviour
             descText.color = canAfford ? new Color(0.8f, 0.8f, 0.8f) : new Color(0.5f, 0.5f, 0.5f);
             
             moveButtons.Add(button);
+        }
+    }
+    
+    /// <summary>
+    /// Shows banter dialogue that auto-dismisses after the specified duration
+    /// </summary>
+    public void ShowBanterDialogue(string dialogue, float duration)
+    {
+        if (banterDialoguePanel == null || banterDialogueText == null)
+            return;
+        
+        // Stop any existing fade coroutine
+        if (banterFadeCoroutine != null)
+        {
+            StopCoroutine(banterFadeCoroutine);
+        }
+        
+        // Set the dialogue text
+        banterDialogueText.text = dialogue;
+        
+        // Show the panel
+        banterDialoguePanel.SetActive(true);
+        
+        // Start auto-dismiss coroutine
+        banterFadeCoroutine = StartCoroutine(AutoDismissBanter(duration));
+    }
+    
+    /// <summary>
+    /// Coroutine that auto-dismisses the banter dialogue after duration
+    /// </summary>
+    private IEnumerator AutoDismissBanter(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        
+        if (banterDialoguePanel != null)
+        {
+            banterDialoguePanel.SetActive(false);
         }
     }
 }
