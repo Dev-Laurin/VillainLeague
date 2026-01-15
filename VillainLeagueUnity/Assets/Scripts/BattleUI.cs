@@ -180,13 +180,21 @@ public class BattleUI : MonoBehaviour
     
     public void ShowMoveSelection(bool show)
     {
-        // Use enhanced move chooser if available, otherwise fall back to old panel
-        if (moveChooserUI != null && !show)
+        // Use enhanced move chooser if available
+        if (moveChooserUI != null)
         {
-            moveChooserUI.HideMoveChooser();
+            // Enhanced UI is shown/hidden via ShowMoveChooser/HideMoveChooser
+            // This method is primarily for compatibility with legacy code
+            // The actual showing is handled by DisplayMoves calling ShowMoveChooser
+            if (!show)
+            {
+                moveChooserUI.HideMoveChooser();
+            }
+            // Note: Showing is handled by DisplayMoves method
         }
         else if (moveSelectionPanel != null)
         {
+            // Fall back to legacy panel
             moveSelectionPanel.SetActive(show);
         }
     }

@@ -396,7 +396,13 @@ public class MoveChooserUI : MonoBehaviour
         foreach (GameObject obj in moveButtonObjects)
         {
             if (obj != null)
-                Destroy(obj);
+            {
+                // Use DestroyImmediate in edit mode, Destroy in play mode
+                if (Application.isPlaying)
+                    Destroy(obj);
+                else
+                    DestroyImmediate(obj);
+            }
         }
         moveButtonObjects.Clear();
     }
