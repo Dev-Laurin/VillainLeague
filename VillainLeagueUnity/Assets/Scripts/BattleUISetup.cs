@@ -18,18 +18,6 @@ public class BattleUISetup : MonoBehaviour
 
     void SetupUI()
     {
-        // Create Canvas
-        GameObject canvasObj = new GameObject("Canvas");
-        canvas = canvasObj.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        
-        CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.matchWidthOrHeight = 0.5f;
-        
-        canvasObj.AddComponent<GraphicRaycaster>();
-
         // Create EventSystem if it doesn't exist
         if (FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)
         {
@@ -37,28 +25,6 @@ public class BattleUISetup : MonoBehaviour
             eventSystemObj.AddComponent<UnityEngine.EventSystems.EventSystem>();
             eventSystemObj.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
         }
-
-        // Create BattleUI component on this GameObject
-        battleUI = gameObject.AddComponent<BattleUI>();
-
-        // Create Turn Order Display (Top Center)
-        battleUI.turnText = CreateText("TurnText", canvas.transform, new Vector2(0, 400), new Vector2(600, 60), 
-            "Turn: Ready", 36, TextAlignmentOptions.Center);
-
-        // Create Next Turn Display (Below Turn Text)
-        battleUI.nextTurnText = CreateText("NextTurnText", canvas.transform, new Vector2(0, 350), new Vector2(600, 40), 
-            "Next: ---", 24, TextAlignmentOptions.Center);
-        battleUI.nextTurnText.color = new Color(0.7f, 0.7f, 0.7f);
-
-        // Create Message Display (Center)
-        battleUI.messageText = CreateText("MessageText", canvas.transform, new Vector2(0, 0), new Vector2(800, 60), 
-            "Battle Start!", 28, TextAlignmentOptions.Center);
-
-        // Setup Player Squad UI (Left Side)
-        SetupPlayerUI(canvas.transform);
-
-        // Setup Enemy Squad UI (Right Side)
-        SetupEnemyUI(canvas.transform);
 
         // Setup Action Buttons (Bottom Center)
         SetupActionButtons(canvas.transform);
