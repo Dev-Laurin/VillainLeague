@@ -46,6 +46,9 @@ public class BattleUI : MonoBehaviour
     public GameObject moveSelectionPanel;
     public Transform moveButtonContainer;
     private List<Button> moveButtons = new List<Button>();
+    
+    [Header("Enhanced Move Chooser")]
+    public MoveChooserUI moveChooserUI;
 
     [Header("Target Selection")]
     public GameObject targetSelectionPanel;
@@ -177,8 +180,23 @@ public class BattleUI : MonoBehaviour
     
     public void ShowMoveSelection(bool show)
     {
-        if (moveSelectionPanel != null)
+        // Use enhanced move chooser if available
+        if (moveChooserUI != null)
+        {
+            // Enhanced UI is shown/hidden via ShowMoveChooser/HideMoveChooser
+            // This method is primarily for compatibility with legacy code
+            // The actual showing is handled by DisplayMoves calling ShowMoveChooser
+            if (!show)
+            {
+                moveChooserUI.HideMoveChooser();
+            }
+            // Note: Showing is handled by DisplayMoves method
+        }
+        else if (moveSelectionPanel != null)
+        {
+            // Fall back to legacy panel
             moveSelectionPanel.SetActive(show);
+        }
     }
     
     public void SetSuperButtonsActive(bool superReady, bool teamSuperReady)
@@ -191,6 +209,14 @@ public class BattleUI : MonoBehaviour
     
     public void DisplayMoves(List<Move> moves, CharacterResource resource, CharacterResource secondaryResource, bool showOnlySupers, System.Action<Move> onMoveSelected)
     {
+        // Use enhanced move chooser if available
+        if (moveChooserUI != null)
+        {
+            moveChooserUI.ShowMoveChooser(moves, resource, secondaryResource, showOnlySupers, onMoveSelected);
+            return;
+        }
+        
+        // Fall back to old system
         // Clear existing move buttons
         foreach (Button btn in moveButtons)
         {
