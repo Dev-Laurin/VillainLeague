@@ -176,8 +176,12 @@ public class BattleObjective
     {
         foreach (Character enemy in enemySquad)
         {
-            if (!charmPoints.ContainsKey(enemy) || charmPoints[enemy] < charmPointsRequired)
-                return false;
+            // Only check living enemies - dead enemies don't need to be charmed
+            if (enemy.IsAlive())
+            {
+                if (!charmPoints.ContainsKey(enemy) || charmPoints[enemy] < charmPointsRequired)
+                    return false;
+            }
         }
         return true;
     }

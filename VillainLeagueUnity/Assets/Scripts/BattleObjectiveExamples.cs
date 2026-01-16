@@ -72,14 +72,14 @@ public class BattleObjectiveExamples : MonoBehaviour
         Character npc = new Character("Merchant", 40, 0, 1, true);
         battleManager.playerSquad.Add(npc);
         
-        // Create custom objective with mixed conditions
-        BattleObjective customObjective = new BattleObjective(BattleObjectiveType.DefendNPC);
-        customObjective.npcToDefend = npc;
-        customObjective.turnsToSurvive = 15;
-        customObjective.objectiveDescription = "Protect the merchant for 15 turns!";
+        // Note: This is a conceptual example showing how you might combine objectives.
+        // The current implementation doesn't support multiple simultaneous objective checks.
+        // You would need to extend BattleObjective.IsObjectiveComplete() to handle
+        // combined conditions like "defend NPC AND survive X turns"
         
-        battleManager.battleObjective = customObjective;
+        battleManager.SetObjectiveDefendNPC(npc);
         Debug.Log("Timed escort mission configured!");
+        Debug.Log("Note: Turn limit would require custom objective implementation");
     }
     
     // Example 9: Boss battle with mana conservation

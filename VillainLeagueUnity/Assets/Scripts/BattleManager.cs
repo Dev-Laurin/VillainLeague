@@ -488,14 +488,31 @@ public class BattleManager : MonoBehaviour
             }
         }
         
-        // Add charm points if move has charm effect and objective is charm-based
-        if (move.charmPoints > 0 && battleObjective != null && 
-            battleObjective.objectiveType == BattleObjectiveType.CharmOpponents &&
-            selectedTarget != null && !selectedTarget.isPlayerCharacter)
+        // Add charm points if move has charm effect
+        // Auto-initialize charm tracking if not already present
+        if (move.charmPoints > 0 && selectedTarget != null && !selectedTarget.isPlayerCharacter)
         {
-            battleObjective.AddCharmPoints(selectedTarget, move.charmPoints);
-            battleUI.ShowMessage($"{selectedTarget.characterName} is charmed! (+{move.charmPoints} charm)");
-            yield return new WaitForSeconds(0.8f);
+            if (battleObjective != null)
+            {
+                // Initialize charm points for this enemy if not already tracked
+                if (!battleObjective.charmPoints.ContainsKey(selectedTarget))
+                {
+                    battleObjective.charmPoints[selectedTarget] = 0;
+                }
+                
+                battleObjective.AddCharmPoints(selectedTarget, move.charmPoints);
+                battleUI.ShowMessage($"{selectedTarget.characterName} is charmed! (+{move.charmPoints} charm)");
+                
+                // For charm objectives, show progress
+                if (battleObjective.objectiveType == BattleObjectiveType.CharmOpponents)
+                {
+                    int currentCharm = battleObjective.charmPoints[selectedTarget];
+                    int requiredCharm = battleObjective.charmPointsRequired;
+                    battleUI.ShowMessage($"{selectedTarget.characterName} charm: {currentCharm}/{requiredCharm}");
+                }
+                
+                yield return new WaitForSeconds(0.8f);
+            }
         }
         
         // Trigger battle banter (only for player characters)
@@ -873,10 +890,18 @@ public class BattleManager : MonoBehaviour
         battleObjective.charmPointsRequired = charmPointsNeeded;
         battleObjective.objectiveDescription = $"Charm all opponents ({charmPointsNeeded} points each)";
         
-        // Initialize charm points for all enemies
-        foreach (Character enemy in enemySquad)
+        // Initialize charm points for all enemies (if squad is populated)
+        // Note: If called before enemy squad is set up, charm points will be initialized
+        // for enemies when they are added during ExecuteMove
+        if (enemySquad != null)
         {
-            battleObjective.charmPoints[enemy] = 0;
+            foreach (Character enemy in enemySquad)
+            {
+                if (!battleObjective.charmPoints.ContainsKey(enemy))
+                {
+                    battleObjective.charmPoints[enemy] = 0;
+                }
+            }
         }
     }
     
