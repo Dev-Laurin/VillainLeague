@@ -30,6 +30,8 @@ public class MoveData
     public int styleGain; // Secondary resource gain
     public int secondaryResourceCost; // Secondary resource cost (for super moves)
     public bool isSuper; // True if this is a super/ultimate move
+    public int charmPoints; // Charm points for charm objectives
+    public bool canHarmAllies; // For moves that can harm allies (e.g., counterattacks)
     public int radius;
     public int moveRange;
     public int durationTurns = 1;
@@ -134,6 +136,8 @@ public static class MoveSetLoader
             move.styleGain = moveData.styleGain;
             move.secondaryResourceCost = moveData.secondaryResourceCost;
             move.isSuper = moveData.isSuper;
+            move.charmPoints = moveData.charmPoints;
+            move.canHarmAllies = moveData.canHarmAllies;
             move.radius = moveData.radius;
             move.moveRange = moveData.moveRange;
             move.durationTurns = moveData.durationTurns;
