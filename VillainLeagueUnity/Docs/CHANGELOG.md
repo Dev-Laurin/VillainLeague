@@ -52,7 +52,7 @@ Added test text for gitbook test
 
 ## v1.5 - 2026-01-10
 
-### PR #12 - Revert "Revert \"Implement character-specific movesets with JSON config system and dual resource types\"\""
+### PR #12 - Re-implement character-specific movesets with JSON config system and dual resource types
 - Re-applied character moveset system after revert
 
 ## v1.4 - 2026-01-10
