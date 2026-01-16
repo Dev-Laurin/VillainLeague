@@ -1,0 +1,85 @@
+{
+  "characterName": "Diplomancer",
+  "role": "Diplomat / Charmer / Negotiator",
+  "resource": {
+    "name": "Charisma",
+    "max": 10,
+    "regenPerTurn": 2
+  },
+  "moves": [
+    {
+      "id": "diplomat_smile",
+      "name": "Charming Smile",
+      "description": "Flash a winning smile at an opponent, earning their trust.",
+      "type": "magic",
+      "manaCost": 1,
+      "charmPoints": 2,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "diplomat_compliment",
+      "name": "Flattering Words",
+      "description": "Compliment your opponent, making them more receptive to your cause.",
+      "type": "magic",
+      "manaCost": 2,
+      "charmPoints": 3,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "diplomat_gift",
+      "name": "Peace Offering",
+      "description": "Offer a gift to your opponent, greatly increasing their favor.",
+      "type": "physical",
+      "manaCost": 3,
+      "charmPoints": 4,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "diplomat_speech",
+      "name": "Inspiring Speech",
+      "description": "Give a rousing speech that charms all opponents slightly.",
+      "type": "magic",
+      "manaCost": 4,
+      "charmPoints": 2,
+      "targetType": "AllEnemies"
+    },
+    {
+      "id": "diplomat_negotiate",
+      "name": "Master Negotiation",
+      "description": "Use your diplomatic prowess to win over an opponent completely.",
+      "type": "magic",
+      "manaCost": 5,
+      "charmPoints": 5,
+      "targetType": "SingleEnemy"
+    },
+    {
+      "id": "diplomat_defend",
+      "name": "Defensive Posture",
+      "description": "Take a non-threatening stance, showing you mean no harm.",
+      "type": "physical",
+      "manaCost": 1,
+      "armor": 3,
+      "charmPoints": 1,
+      "durationTurns": 1,
+      "targetType": "Self"
+    },
+    {
+      "id": "diplomat_heal_ally",
+      "name": "Compassionate Care",
+      "description": "Tend to an ally's wounds, demonstrating your peaceful nature.",
+      "type": "magic",
+      "manaCost": 2,
+      "healing": 5,
+      "targetType": "SingleAlly"
+    },
+    {
+      "id": "diplomat_group_charm",
+      "name": "Mass Appeal",
+      "description": "Appeal to all opponents at once with your charisma.",
+      "type": "magic",
+      "manaCost": 6,
+      "charmPoints": 3,
+      "targetType": "AllEnemies"
+    }
+  ]
+}

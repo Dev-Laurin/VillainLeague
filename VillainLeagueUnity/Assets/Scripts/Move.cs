@@ -28,6 +28,7 @@ public class Move
     public int armorPierce;
     public int bleed;
     public int counterDamage;
+    public bool canHarmAllies; // For moves with counterattacks or AOE that could hit allies/NPCs
     
     // Secondary resource gain (e.g., Style)
     public int styleGain;
@@ -35,6 +36,9 @@ public class Move
     // Secondary resource cost (e.g., Style) - for super/ultimate moves
     public int secondaryResourceCost;
     public bool isSuper; // True if this is a super/ultimate move
+    
+    // Charm effect (for charm objective)
+    public int charmPoints;
     
     // Area of effect
     public int radius;

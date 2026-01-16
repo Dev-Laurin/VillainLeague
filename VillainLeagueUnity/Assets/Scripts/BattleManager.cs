@@ -29,6 +29,9 @@ public class BattleManager : MonoBehaviour
     public BattleUI battleUI;
     public TurnManager turnManager;
     public BattleBanter battleBanter;
+    
+    [Header("Battle Objective")]
+    public BattleObjective battleObjective;
 
     private BattleState currentState;
     private BattleAction selectedAction;
@@ -64,6 +67,12 @@ public class BattleManager : MonoBehaviour
         Character villain2 = new Character("Villain 2", 90, 10, 6, false);
         villain2.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Villain 2"));
         enemySquad.Add(villain2);
+        
+        // Setup battle objective (default: defeat all enemies)
+        if (battleObjective == null)
+        {
+            battleObjective = new BattleObjective(BattleObjectiveType.DefeatAllEnemies);
+        }
 
         // Setup turn order
         List<Character> allCharacters = new List<Character>();
@@ -88,6 +97,14 @@ public class BattleManager : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         battleUI.ShowMessage("Battle Start!");
+        
+        // Display objective
+        if (battleObjective != null && battleObjective.objectiveDescription != null)
+        {
+            yield return new WaitForSeconds(1f);
+            battleUI.ShowMessage($"Objective: {battleObjective.objectiveDescription}");
+        }
+        
         yield return new WaitForSeconds(1f);
 
         while (currentState != BattleState.WON && currentState != BattleState.LOST)
@@ -121,24 +138,53 @@ public class BattleManager : MonoBehaviour
 
             UpdateAllUI();
             
-            // Check win/lose conditions
-            if (!turnManager.HasAliveEnemies())
+            // Check win/lose conditions based on objective
+            if (battleObjective != null)
             {
-                currentState = BattleState.WON;
-                battleUI.ShowMessage("Victory!");
-                Debug.Log("Player wins!");
-                yield break;
+                if (battleObjective.IsObjectiveFailed(playerSquad, enemySquad))
+                {
+                    currentState = BattleState.LOST;
+                    battleUI.ShowMessage(GetObjectiveFailureMessage());
+                    Debug.Log("Objective failed!");
+                    yield break;
+                }
+                
+                if (battleObjective.IsObjectiveComplete(playerSquad, enemySquad))
+                {
+                    currentState = BattleState.WON;
+                    battleUI.ShowMessage(GetObjectiveSuccessMessage());
+                    Debug.Log("Objective complete!");
+                    yield break;
+                }
             }
-            
-            if (!turnManager.HasAlivePlayers())
+            else
             {
-                currentState = BattleState.LOST;
-                battleUI.ShowMessage("Defeat...");
-                Debug.Log("Player loses!");
-                yield break;
+                // Fallback to default win/lose conditions
+                if (!turnManager.HasAliveEnemies())
+                {
+                    currentState = BattleState.WON;
+                    battleUI.ShowMessage("Victory!");
+                    Debug.Log("Player wins!");
+                    yield break;
+                }
+                
+                if (!turnManager.HasAlivePlayers())
+                {
+                    currentState = BattleState.LOST;
+                    battleUI.ShowMessage("Defeat...");
+                    Debug.Log("Player loses!");
+                    yield break;
+                }
             }
 
             turnManager.NextTurn();
+            
+            // Increment turn counter for objective tracking
+            if (battleObjective != null)
+            {
+                battleObjective.IncrementTurn();
+            }
+            
             yield return new WaitForSeconds(0.5f);
         }
     }
@@ -267,8 +313,19 @@ public class BattleManager : MonoBehaviour
         bool moveSelected = false;
         selectedMove = null;
         
+        // Filter moves based on objective constraints
+        List<Move> availableMoves = new List<Move>(character.moveSet.moves);
+        
+        // For DefendNPC objective, exclude moves that can harm allies
+        if (battleObjective != null && 
+            battleObjective.objectiveType == BattleObjectiveType.DefendNPC &&
+            battleObjective.npcToDefend != null && battleObjective.npcToDefend.IsAlive())
+        {
+            availableMoves.RemoveAll(move => move.canHarmAllies);
+        }
+        
         // Display moves with resource info
-        battleUI.DisplayMoves(character.moveSet.moves, character.moveSet.resource, character.secondaryResource, showOnlySupers, (Move move) =>
+        battleUI.DisplayMoves(availableMoves, character.moveSet.resource, character.secondaryResource, showOnlySupers, (Move move) =>
         {
             selectedMove = move;
             moveSelected = true;
@@ -341,6 +398,21 @@ public class BattleManager : MonoBehaviour
             {
                 int totalDamage = move.damage * move.hits;
                 int actualDamage = Mathf.Max(1, totalDamage - selectedTarget.defense);
+                
+                // Check if ReduceToThreshold objective - prevent killing
+                if (battleObjective != null && 
+                    battleObjective.objectiveType == BattleObjectiveType.ReduceToThreshold &&
+                    !selectedTarget.isPlayerCharacter)
+                {
+                    int minHP = 1; // Keep enemies alive with at least 1 HP
+                    int newHP = selectedTarget.currentHP - actualDamage;
+                    if (newHP < minHP)
+                    {
+                        actualDamage = selectedTarget.currentHP - minHP;
+                        totalDamage = actualDamage + selectedTarget.defense;
+                    }
+                }
+                
                 selectedTarget.TakeDamage(totalDamage);
                 
                 string hitText = move.hits > 1 ? $" ({move.hits} hits)" : "";
@@ -373,7 +445,23 @@ public class BattleManager : MonoBehaviour
                 if (enemy.IsAlive() && move.damage > 0)
                 {
                     int actualDamage = Mathf.Max(1, move.damage - enemy.defense);
-                    enemy.TakeDamage(move.damage);
+                    int totalDamage = move.damage;
+                    
+                    // Check if ReduceToThreshold objective - prevent killing
+                    if (battleObjective != null && 
+                        battleObjective.objectiveType == BattleObjectiveType.ReduceToThreshold &&
+                        !enemy.isPlayerCharacter)
+                    {
+                        int minHP = 1;
+                        int newHP = enemy.currentHP - actualDamage;
+                        if (newHP < minHP)
+                        {
+                            actualDamage = enemy.currentHP - minHP;
+                            totalDamage = actualDamage + enemy.defense;
+                        }
+                    }
+                    
+                    enemy.TakeDamage(totalDamage);
                 }
             }
             battleUI.ShowMessage($"{caster.characterName}'s {move.moveName} hits all enemies!");
@@ -396,6 +484,33 @@ public class BattleManager : MonoBehaviour
             {
                 battleUI.ShowMessage($"{caster.characterName} gains {styleGained} {caster.secondaryResource.resourceName}!");
                 UpdateAllUI();
+                yield return new WaitForSeconds(0.8f);
+            }
+        }
+        
+        // Add charm points if move has charm effect
+        // Auto-initialize charm tracking if not already present
+        if (move.charmPoints > 0 && selectedTarget != null && !selectedTarget.isPlayerCharacter)
+        {
+            if (battleObjective != null)
+            {
+                // Initialize charm points for this enemy if not already tracked
+                if (!battleObjective.charmPoints.ContainsKey(selectedTarget))
+                {
+                    battleObjective.charmPoints[selectedTarget] = 0;
+                }
+                
+                battleObjective.AddCharmPoints(selectedTarget, move.charmPoints);
+                battleUI.ShowMessage($"{selectedTarget.characterName} is charmed! (+{move.charmPoints} charm)");
+                
+                // For charm objectives, show progress
+                if (battleObjective.objectiveType == BattleObjectiveType.CharmOpponents)
+                {
+                    int currentCharm = battleObjective.charmPoints[selectedTarget];
+                    int requiredCharm = battleObjective.charmPointsRequired;
+                    battleUI.ShowMessage($"{selectedTarget.characterName} charm: {currentCharm}/{requiredCharm}");
+                }
+                
                 yield return new WaitForSeconds(0.8f);
             }
         }
@@ -692,5 +807,109 @@ public class BattleManager : MonoBehaviour
         
         battleUI.ShowMessage("Devastating team attack hits all enemies!");
         yield return new WaitForSeconds(2f);
+    }
+    
+    string GetObjectiveSuccessMessage()
+    {
+        if (battleObjective == null) return "Victory!";
+        
+        switch (battleObjective.objectiveType)
+        {
+            case BattleObjectiveType.DefeatAllEnemies:
+                return "Victory! All enemies defeated!";
+            case BattleObjectiveType.DefendNPC:
+                return "Success! NPC protected!";
+            case BattleObjectiveType.ReduceToThreshold:
+                return "Success! All enemies weakened!";
+            case BattleObjectiveType.SurviveTurns:
+                return $"Victory! Survived {battleObjective.turnsToSurvive} turns!";
+            case BattleObjectiveType.FinishWithMana:
+                return "Victory! Battle complete with mana intact!";
+            case BattleObjectiveType.CharmOpponents:
+                return "Success! All opponents charmed!";
+            case BattleObjectiveType.LimitedVisibility:
+                return "Victory! Survived the darkness!";
+            default:
+                return "Victory!";
+        }
+    }
+    
+    string GetObjectiveFailureMessage()
+    {
+        if (battleObjective == null) return "Defeat...";
+        
+        switch (battleObjective.objectiveType)
+        {
+            case BattleObjectiveType.DefendNPC:
+                return "Defeat... NPC was defeated!";
+            case BattleObjectiveType.FinishWithMana:
+                return "Defeat... Not enough mana remaining!";
+            default:
+                return "Defeat...";
+        }
+    }
+    
+    // Helper methods to configure different objective types
+    public void SetObjectiveDefeatAllEnemies()
+    {
+        battleObjective = new BattleObjective(BattleObjectiveType.DefeatAllEnemies);
+        battleObjective.UpdateDescription();
+    }
+    
+    public void SetObjectiveDefendNPC(Character npc)
+    {
+        battleObjective = new BattleObjective(BattleObjectiveType.DefendNPC);
+        battleObjective.npcToDefend = npc;
+        battleObjective.objectiveDescription = $"Protect {npc.characterName}";
+    }
+    
+    public void SetObjectiveReduceToThreshold(int hpThreshold)
+    {
+        battleObjective = new BattleObjective(BattleObjectiveType.ReduceToThreshold);
+        battleObjective.hpThreshold = hpThreshold;
+        battleObjective.objectiveDescription = $"Reduce all enemies to {hpThreshold} HP or lower";
+    }
+    
+    public void SetObjectiveSurviveTurns(int turns)
+    {
+        battleObjective = new BattleObjective(BattleObjectiveType.SurviveTurns);
+        battleObjective.turnsToSurvive = turns;
+        battleObjective.objectiveDescription = $"Survive for {turns} turns";
+    }
+    
+    public void SetObjectiveFinishWithMana(int manaRequired)
+    {
+        battleObjective = new BattleObjective(BattleObjectiveType.FinishWithMana);
+        battleObjective.manaThresholdRequired = manaRequired;
+        battleObjective.objectiveDescription = $"Finish with at least {manaRequired} total mana";
+    }
+    
+    public void SetObjectiveCharmOpponents(int charmPointsNeeded)
+    {
+        battleObjective = new BattleObjective(BattleObjectiveType.CharmOpponents);
+        battleObjective.charmPointsRequired = charmPointsNeeded;
+        battleObjective.objectiveDescription = $"Charm all opponents ({charmPointsNeeded} points each)";
+        
+        // Initialize charm points for all enemies (if squad is populated)
+        // Note: If called before enemy squad is set up, charm points will be initialized
+        // for enemies when they are added during ExecuteMove
+        if (enemySquad != null)
+        {
+            foreach (Character enemy in enemySquad)
+            {
+                if (!battleObjective.charmPoints.ContainsKey(enemy))
+                {
+                    battleObjective.charmPoints[enemy] = 0;
+                }
+            }
+        }
+    }
+    
+    public void SetObjectiveLimitedVisibility(int veinVisionCost)
+    {
+        battleObjective = new BattleObjective(BattleObjectiveType.LimitedVisibility);
+        battleObjective.visibilityEnabled = false;
+        battleObjective.veinVisionManaCost = veinVisionCost;
+        battleObjective.objectiveDescription = $"Defeat enemies in darkness (Vein Vision: {veinVisionCost} mana)";
     }
 }
