@@ -19,6 +19,7 @@ Villain League is a comprehensive turn-based battle system built in Unity that b
 - **🤝 Team Super Attacks** - When both heroes are charged, unleash a combined attack for massive damage
 - **💬 Battle Banter** - Dynamic dialogue between characters that reacts to moves and battle situations
 - **🎨 Medieval Fantasy UI** - Beautiful parchment-themed move selection interface with hover descriptions
+- **🎯 Multiple Battle Objectives** - 7 different victory conditions including NPC defense, survival, charm, and more
 - **🔄 Turn-Based Combat** - Strategic gameplay with resource management and tactical decision-making
 - **📊 Resource Management** - Multiple resource types (Mana, Focus, Energy, Style, Resolve) with regeneration
 - **🎭 Character Personalities** - Each hero has unique dialogue reflecting their personality
@@ -110,6 +111,26 @@ A beautiful medieval fantasy-themed interface for move selection:
   - Duration and target type
 
 📚 **Documentation:** [MOVE_CHOOSER_UI_README.md](MOVE_CHOOSER_UI_README.md) | [UI Guide](MOVE_CHOOSER_UI_GUIDE.md) | [UI Mockup](MOVE_CHOOSER_UI_MOCKUP.md)
+
+### Battle Objectives System
+
+Flexible objective system supporting multiple victory conditions beyond simple enemy defeat:
+
+- **7 Objective Types:**
+  - **Defeat All Enemies** - Classic battle mode
+  - **Defend NPC** - Protect a character from defeat (filters harmful moves)
+  - **Reduce to HP Threshold** - Weaken enemies without KO (prevents death)
+  - **Survive X Turns** - Last for a specific turn count
+  - **Finish With Mana** - Complete with resource threshold intact
+  - **Charm Opponents** - Win through diplomacy (charm points system)
+  - **Limited Visibility** - Battle in darkness with vein vision mechanic
+
+- **Custom Win/Lose Conditions** - Each objective has unique success/failure criteria
+- **Gameplay Modifications** - Objectives can restrict moves or modify damage
+- **Easy Configuration** - Helper methods for quick objective setup
+- **Example Scenarios** - 10+ pre-configured battle types included
+
+📚 **Documentation:** [Battle Objectives Guide](BATTLE_OBJECTIVES_GUIDE.md) | [Example Script](VillainLeagueUnity/Assets/Scripts/BattleObjectiveExamples.cs)
 
 ### Battle System Core
 
@@ -216,6 +237,7 @@ VillainLeague/
 - **[Super Abilities](SUPER_ABILITIES.md)** - Ultimate moves and team attacks
 - **[Battle Banter](BANTER_README.md)** - Dynamic dialogue system
 - **[Move Chooser UI](MOVE_CHOOSER_UI_README.md)** - Enhanced UI system
+- **[Battle Objectives](BATTLE_OBJECTIVES_GUIDE.md)** - Multiple victory conditions and objective types
 
 ### Technical Documentation
 - **[Battle System](VillainLeagueUnity/Docs/BATTLE_SYSTEM_README.md)** - Core battle mechanics
@@ -323,6 +345,12 @@ VillainLeague/
 - [x] Medieval fantasy move selection UI
 - [x] Hover descriptions and visual feedback
 - [x] Character JSON configuration system
+- [x] Battle objectives system with 7 objective types
+- [x] NPC defense mechanics
+- [x] HP threshold system (non-lethal combat)
+- [x] Charm/diplomacy victory condition
+- [x] Turn survival objectives
+- [x] Mana conservation objectives
 - [x] Comprehensive documentation
 
 ### Future Enhancements 🔮
@@ -332,6 +360,8 @@ VillainLeague/
 - [ ] Voice acting for banter
 - [ ] Additional characters with unique movesets
 - [ ] More battle scenarios and maps
+- [ ] Visual effects for limited visibility objective
+- [ ] Objective progress UI indicators
 - [ ] Equipment system
 - [ ] Experience and leveling
 - [ ] Status effect animations
