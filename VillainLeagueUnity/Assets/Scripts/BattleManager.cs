@@ -29,6 +29,9 @@ public class BattleManager : MonoBehaviour
     public BattleUI battleUI;
     public TurnManager turnManager;
     public BattleBanter battleBanter;
+    
+    [Header("Battle Objective")]
+    public BattleObjective battleObjective;
 
     private BattleState currentState;
     private BattleAction selectedAction;
@@ -64,6 +67,12 @@ public class BattleManager : MonoBehaviour
         Character villain2 = new Character("Villain 2", 90, 10, 6, false);
         villain2.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Villain 2"));
         enemySquad.Add(villain2);
+        
+        // Setup battle objective (default: defeat all enemies)
+        if (battleObjective == null)
+        {
+            battleObjective = new BattleObjective(BattleObjectiveType.DefeatAllEnemies);
+        }
 
         // Setup turn order
         List<Character> allCharacters = new List<Character>();
@@ -88,6 +97,14 @@ public class BattleManager : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         battleUI.ShowMessage("Battle Start!");
+        
+        // Display objective
+        if (battleObjective != null && battleObjective.objectiveDescription != null)
+        {
+            yield return new WaitForSeconds(1f);
+            battleUI.ShowMessage($"Objective: {battleObjective.objectiveDescription}");
+        }
+        
         yield return new WaitForSeconds(1f);
 
         while (currentState != BattleState.WON && currentState != BattleState.LOST)
@@ -121,24 +138,53 @@ public class BattleManager : MonoBehaviour
 
             UpdateAllUI();
             
-            // Check win/lose conditions
-            if (!turnManager.HasAliveEnemies())
+            // Check win/lose conditions based on objective
+            if (battleObjective != null)
             {
-                currentState = BattleState.WON;
-                battleUI.ShowMessage("Victory!");
-                Debug.Log("Player wins!");
-                yield break;
+                if (battleObjective.IsObjectiveFailed(playerSquad, enemySquad))
+                {
+                    currentState = BattleState.LOST;
+                    battleUI.ShowMessage(GetObjectiveFailureMessage());
+                    Debug.Log("Objective failed!");
+                    yield break;
+                }
+                
+                if (battleObjective.IsObjectiveComplete(playerSquad, enemySquad))
+                {
+                    currentState = BattleState.WON;
+                    battleUI.ShowMessage(GetObjectiveSuccessMessage());
+                    Debug.Log("Objective complete!");
+                    yield break;
+                }
             }
-            
-            if (!turnManager.HasAlivePlayers())
+            else
             {
-                currentState = BattleState.LOST;
-                battleUI.ShowMessage("Defeat...");
-                Debug.Log("Player loses!");
-                yield break;
+                // Fallback to default win/lose conditions
+                if (!turnManager.HasAliveEnemies())
+                {
+                    currentState = BattleState.WON;
+                    battleUI.ShowMessage("Victory!");
+                    Debug.Log("Player wins!");
+                    yield break;
+                }
+                
+                if (!turnManager.HasAlivePlayers())
+                {
+                    currentState = BattleState.LOST;
+                    battleUI.ShowMessage("Defeat...");
+                    Debug.Log("Player loses!");
+                    yield break;
+                }
             }
 
             turnManager.NextTurn();
+            
+            // Increment turn counter for objective tracking
+            if (battleObjective != null)
+            {
+                battleObjective.IncrementTurn();
+            }
+            
             yield return new WaitForSeconds(0.5f);
         }
     }
@@ -398,6 +444,16 @@ public class BattleManager : MonoBehaviour
                 UpdateAllUI();
                 yield return new WaitForSeconds(0.8f);
             }
+        }
+        
+        // Add charm points if move has charm effect and objective is charm-based
+        if (move.charmPoints > 0 && battleObjective != null && 
+            battleObjective.objectiveType == BattleObjectiveType.CharmOpponents &&
+            selectedTarget != null && !selectedTarget.isPlayerCharacter)
+        {
+            battleObjective.AddCharmPoints(selectedTarget, move.charmPoints);
+            battleUI.ShowMessage($"{selectedTarget.characterName} is charmed! (+{move.charmPoints} charm)");
+            yield return new WaitForSeconds(0.8f);
         }
         
         // Trigger battle banter (only for player characters)
@@ -692,5 +748,45 @@ public class BattleManager : MonoBehaviour
         
         battleUI.ShowMessage("Devastating team attack hits all enemies!");
         yield return new WaitForSeconds(2f);
+    }
+    
+    string GetObjectiveSuccessMessage()
+    {
+        if (battleObjective == null) return "Victory!";
+        
+        switch (battleObjective.objectiveType)
+        {
+            case BattleObjectiveType.DefeatAllEnemies:
+                return "Victory! All enemies defeated!";
+            case BattleObjectiveType.DefendNPC:
+                return "Success! NPC protected!";
+            case BattleObjectiveType.ReduceToThreshold:
+                return "Success! All enemies weakened!";
+            case BattleObjectiveType.SurviveTurns:
+                return $"Victory! Survived {battleObjective.turnsToSurvive} turns!";
+            case BattleObjectiveType.FinishWithMana:
+                return "Victory! Battle complete with mana intact!";
+            case BattleObjectiveType.CharmOpponents:
+                return "Success! All opponents charmed!";
+            case BattleObjectiveType.LimitedVisibility:
+                return "Victory! Survived the darkness!";
+            default:
+                return "Victory!";
+        }
+    }
+    
+    string GetObjectiveFailureMessage()
+    {
+        if (battleObjective == null) return "Defeat...";
+        
+        switch (battleObjective.objectiveType)
+        {
+            case BattleObjectiveType.DefendNPC:
+                return "Defeat... NPC was defeated!";
+            case BattleObjectiveType.FinishWithMana:
+                return "Defeat... Not enough mana remaining!";
+            default:
+                return "Defeat...";
+        }
     }
 }

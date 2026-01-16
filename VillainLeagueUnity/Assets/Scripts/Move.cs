@@ -36,6 +36,9 @@ public class Move
     public int secondaryResourceCost;
     public bool isSuper; // True if this is a super/ultimate move
     
+    // Charm effect (for charm objective)
+    public int charmPoints;
+    
     // Area of effect
     public int radius;
     public int moveRange;
