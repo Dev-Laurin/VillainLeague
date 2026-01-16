@@ -313,8 +313,19 @@ public class BattleManager : MonoBehaviour
         bool moveSelected = false;
         selectedMove = null;
         
+        // Filter moves based on objective constraints
+        List<Move> availableMoves = new List<Move>(character.moveSet.moves);
+        
+        // For DefendNPC objective, exclude moves that can harm allies
+        if (battleObjective != null && 
+            battleObjective.objectiveType == BattleObjectiveType.DefendNPC &&
+            battleObjective.npcToDefend != null && battleObjective.npcToDefend.IsAlive())
+        {
+            availableMoves.RemoveAll(move => move.canHarmAllies);
+        }
+        
         // Display moves with resource info
-        battleUI.DisplayMoves(character.moveSet.moves, character.moveSet.resource, character.secondaryResource, showOnlySupers, (Move move) =>
+        battleUI.DisplayMoves(availableMoves, character.moveSet.resource, character.secondaryResource, showOnlySupers, (Move move) =>
         {
             selectedMove = move;
             moveSelected = true;
@@ -387,6 +398,21 @@ public class BattleManager : MonoBehaviour
             {
                 int totalDamage = move.damage * move.hits;
                 int actualDamage = Mathf.Max(1, totalDamage - selectedTarget.defense);
+                
+                // Check if ReduceToThreshold objective - prevent killing
+                if (battleObjective != null && 
+                    battleObjective.objectiveType == BattleObjectiveType.ReduceToThreshold &&
+                    !selectedTarget.isPlayerCharacter)
+                {
+                    int minHP = 1; // Keep enemies alive with at least 1 HP
+                    int newHP = selectedTarget.currentHP - actualDamage;
+                    if (newHP < minHP)
+                    {
+                        actualDamage = selectedTarget.currentHP - minHP;
+                        totalDamage = actualDamage + selectedTarget.defense;
+                    }
+                }
+                
                 selectedTarget.TakeDamage(totalDamage);
                 
                 string hitText = move.hits > 1 ? $" ({move.hits} hits)" : "";
@@ -419,7 +445,23 @@ public class BattleManager : MonoBehaviour
                 if (enemy.IsAlive() && move.damage > 0)
                 {
                     int actualDamage = Mathf.Max(1, move.damage - enemy.defense);
-                    enemy.TakeDamage(move.damage);
+                    int totalDamage = move.damage;
+                    
+                    // Check if ReduceToThreshold objective - prevent killing
+                    if (battleObjective != null && 
+                        battleObjective.objectiveType == BattleObjectiveType.ReduceToThreshold &&
+                        !enemy.isPlayerCharacter)
+                    {
+                        int minHP = 1;
+                        int newHP = enemy.currentHP - actualDamage;
+                        if (newHP < minHP)
+                        {
+                            actualDamage = enemy.currentHP - minHP;
+                            totalDamage = actualDamage + enemy.defense;
+                        }
+                    }
+                    
+                    enemy.TakeDamage(totalDamage);
                 }
             }
             battleUI.ShowMessage($"{caster.characterName}'s {move.moveName} hits all enemies!");
@@ -788,5 +830,61 @@ public class BattleManager : MonoBehaviour
             default:
                 return "Defeat...";
         }
+    }
+    
+    // Helper methods to configure different objective types
+    public void SetObjectiveDefeatAllEnemies()
+    {
+        battleObjective = new BattleObjective(BattleObjectiveType.DefeatAllEnemies);
+        battleObjective.UpdateDescription();
+    }
+    
+    public void SetObjectiveDefendNPC(Character npc)
+    {
+        battleObjective = new BattleObjective(BattleObjectiveType.DefendNPC);
+        battleObjective.npcToDefend = npc;
+        battleObjective.objectiveDescription = $"Protect {npc.characterName}";
+    }
+    
+    public void SetObjectiveReduceToThreshold(int hpThreshold)
+    {
+        battleObjective = new BattleObjective(BattleObjectiveType.ReduceToThreshold);
+        battleObjective.hpThreshold = hpThreshold;
+        battleObjective.objectiveDescription = $"Reduce all enemies to {hpThreshold} HP or lower";
+    }
+    
+    public void SetObjectiveSurviveTurns(int turns)
+    {
+        battleObjective = new BattleObjective(BattleObjectiveType.SurviveTurns);
+        battleObjective.turnsToSurvive = turns;
+        battleObjective.objectiveDescription = $"Survive for {turns} turns";
+    }
+    
+    public void SetObjectiveFinishWithMana(int manaRequired)
+    {
+        battleObjective = new BattleObjective(BattleObjectiveType.FinishWithMana);
+        battleObjective.manaThresholdRequired = manaRequired;
+        battleObjective.objectiveDescription = $"Finish with at least {manaRequired} total mana";
+    }
+    
+    public void SetObjectiveCharmOpponents(int charmPointsNeeded)
+    {
+        battleObjective = new BattleObjective(BattleObjectiveType.CharmOpponents);
+        battleObjective.charmPointsRequired = charmPointsNeeded;
+        battleObjective.objectiveDescription = $"Charm all opponents ({charmPointsNeeded} points each)";
+        
+        // Initialize charm points for all enemies
+        foreach (Character enemy in enemySquad)
+        {
+            battleObjective.charmPoints[enemy] = 0;
+        }
+    }
+    
+    public void SetObjectiveLimitedVisibility(int veinVisionCost)
+    {
+        battleObjective = new BattleObjective(BattleObjectiveType.LimitedVisibility);
+        battleObjective.visibilityEnabled = false;
+        battleObjective.veinVisionManaCost = veinVisionCost;
+        battleObjective.objectiveDescription = $"Defeat enemies in darkness (Vein Vision: {veinVisionCost} mana)";
     }
 }

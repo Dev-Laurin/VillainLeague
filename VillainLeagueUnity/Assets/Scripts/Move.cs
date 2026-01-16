@@ -28,6 +28,7 @@ public class Move
     public int armorPierce;
     public int bleed;
     public int counterDamage;
+    public bool canHarmAllies; // For moves with counterattacks or AOE that could hit allies/NPCs
     
     // Secondary resource gain (e.g., Style)
     public int styleGain;
