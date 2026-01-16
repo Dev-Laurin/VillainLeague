@@ -50,6 +50,12 @@ public class MoveChooserUI : MonoBehaviour
     {
         onMoveSelected = onSelected;
         ClearMoveButtons();
+
+        // Ensure the chooser panel is active before creating buttons so layouts calculate sizes
+        if (moveChooserPanel != null && !moveChooserPanel.activeSelf)
+        {
+            moveChooserPanel.SetActive(true);
+        }
         
         // Filter moves
         List<Move> filteredMoves = new List<Move>();
@@ -66,10 +72,62 @@ public class MoveChooserUI : MonoBehaviour
         
         // Show panel
         if (moveChooserPanel != null)
+        {
             moveChooserPanel.SetActive(true);
+            // Ensure full-panel background doesn't block pointer events to children
+            Image mainBg = moveChooserPanel.GetComponent<Image>();
+            if (mainBg != null)
+                mainBg.raycastTarget = false;
+
+            // Also disable raycast on common non-interactive children (viewport, list background, description)
+            if (scrollRect != null && scrollRect.viewport != null)
+            {
+                Image vpImg = scrollRect.viewport.GetComponent<Image>();
+                if (vpImg != null) vpImg.raycastTarget = false;
+            }
+
+            if (moveListContainer != null)
+            {
+                Image listImg = moveListContainer.GetComponent<Image>();
+                if (listImg != null) listImg.raycastTarget = false;
+            }
+        }
             
         // Clear description panel initially
         ClearDescriptionPanel();
+        // Make description panel background non-blocking so hover/clicks reach the move buttons
+        if (descriptionPanel != null)
+        {
+            Image descBg = descriptionPanel.GetComponent<Image>();
+            if (descBg != null)
+                descBg.raycastTarget = false;
+
+            // Also disable raycast on textual elements in description to be safe
+            foreach (var tmp in descriptionPanel.GetComponentsInChildren<TextMeshProUGUI>())
+            {
+                tmp.raycastTarget = false;
+            }
+        }
+
+        // Defensive runtime fix: If a BackgroundCanvas exists in the scene it may have an Image
+        // that blocks pointer events. Disable raycastTarget on any Image under it so our
+        // move buttons receive pointer events.
+        GameObject bgCanvasObj = GameObject.Find("BackgroundCanvas");
+        if (bgCanvasObj != null)
+        {
+            Image[] bgImages = bgCanvasObj.GetComponentsInChildren<Image>(true);
+            foreach (var img in bgImages)
+            {
+                if (img != null && img.raycastTarget)
+                {
+                    img.raycastTarget = false;
+                    Debug.Log($"[MoveChooser] Disabled raycastTarget on blocking Image: {img.gameObject.name}");
+                }
+            }
+        }
+
+        // Diagnostic: run a UI raycast at the current mouse position to see which elements are under pointer
+        DebugUIRaycastAtPointer();
     }
     
     /// <summary>
@@ -87,6 +145,7 @@ public class MoveChooserUI : MonoBehaviour
     /// </summary>
     void CreateMoveButtons(List<Move> moves, CharacterResource resource, CharacterResource secondaryResource)
     {
+        Debug.Log($"Creating move buttons {moves.Count}");
         if (moveButtonParent == null || moves == null) return;
         
         for (int i = 0; i < moves.Count; i++)
@@ -99,10 +158,16 @@ public class MoveChooserUI : MonoBehaviour
             
             // Add RectTransform
             RectTransform rectTransform = buttonObj.AddComponent<RectTransform>();
-            rectTransform.sizeDelta = new Vector2(650, 70);
+            // Let the VerticalLayoutGroup / ContentSizeFitter manage positioning. Provide a preferred height.
+            rectTransform.sizeDelta = new Vector2(0, 70);
             rectTransform.anchorMin = new Vector2(0, 1);
-            rectTransform.anchorMax = new Vector2(0, 1);
-            rectTransform.pivot = new Vector2(0, 1);
+            rectTransform.anchorMax = new Vector2(1, 1);
+            rectTransform.pivot = new Vector2(0.5f, 1f);
+
+            // Add LayoutElement so the parent VerticalLayoutGroup can size and space children correctly
+            LayoutElement layout = buttonObj.AddComponent<LayoutElement>();
+            layout.preferredHeight = 70f;
+            layout.preferredWidth = 500f;
             
             // Check affordability
             bool canAffordPrimary = resource == null || resource.CanAfford(move.resourceCost);
@@ -112,6 +177,10 @@ public class MoveChooserUI : MonoBehaviour
             bool canAfford = canAffordPrimary && canAffordSecondary;
             
             // Add Image (background)
+            // Ensure a CanvasRenderer exists for UI rendering
+            if (buttonObj.GetComponent<CanvasRenderer>() == null)
+                buttonObj.AddComponent<CanvasRenderer>();
+
             Image image = buttonObj.AddComponent<Image>();
             image.color = canAfford ? affordableColor : unaffordableColor;
             
@@ -131,25 +200,77 @@ public class MoveChooserUI : MonoBehaviour
             Move capturedMove = move; // Capture for closure
             button.onClick.AddListener(() => OnMoveClicked(capturedMove));
             
-            // Add hover handlers using EventTrigger
-            EventTrigger trigger = buttonObj.AddComponent<EventTrigger>();
-            
-            // Pointer Enter (hover)
-            EventTrigger.Entry entryEnter = new EventTrigger.Entry();
-            entryEnter.eventID = EventTriggerType.PointerEnter;
-            entryEnter.callback.AddListener((data) => OnMoveHover(capturedMove, resource, secondaryResource));
-            trigger.triggers.Add(entryEnter);
-            
-            // Pointer Exit (unhover)
-            EventTrigger.Entry entryExit = new EventTrigger.Entry();
-            entryExit.eventID = EventTriggerType.PointerExit;
-            entryExit.callback.AddListener((data) => OnMoveUnhover());
-            trigger.triggers.Add(entryExit);
+            // Add a small handler component to forward pointer events reliably
+            MoveButtonHandler handler = buttonObj.AddComponent<MoveButtonHandler>();
+            handler.move = capturedMove;
+            handler.parentUI = this;
+            handler.resource = resource;
+            handler.secondaryResource = secondaryResource;
             
             // Create text elements with medieval styling
             CreateMoveButtonText(buttonObj, move, resource, canAfford);
             
+
+            // Log component presence for diagnostics
+            bool hasImage = buttonObj.GetComponent<Image>() != null;
+            bool hasButton = buttonObj.GetComponent<Button>() != null;
+            bool hasCanvasRenderer = buttonObj.GetComponent<CanvasRenderer>() != null;
+            Debug.Log($"[MoveChooser] Components on {buttonObj.name}: Image={hasImage} Button={hasButton} CanvasRenderer={hasCanvasRenderer}");
+
             moveButtonObjects.Add(buttonObj);
+
+            // Diagnostic logging for each created button
+            RectTransform rt = buttonObj.GetComponent<RectTransform>();
+            Debug.Log($"[MoveChooser] Created button idx={i} name={buttonObj.name} parent={moveButtonParent.name} rect.size={rt.rect.size} preferredH={layout.preferredHeight} interactable={button.interactable}");
+        }
+
+        // Force Unity to rebuild layouts so RectTransforms get correct sizes before input tests
+        RectTransform contentRect = moveButtonParent as RectTransform;
+        if (contentRect != null)
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
+            Canvas.ForceUpdateCanvases();
+            // Log sizes after rebuild
+            for (int j = 0; j < moveButtonObjects.Count; j++)
+            {
+                var obj = moveButtonObjects[j];
+                if (obj == null) continue;
+                RectTransform r = obj.GetComponent<RectTransform>();
+                Debug.Log($"[MoveChooser] AfterRebuild button idx={j} name={obj.name} rect.size={r.rect.size}");
+            }
+
+            // Re-run the UI raycast diagnostic now that layout is rebuilt
+            DebugUIRaycastAtPointer();
+
+            // If widths are zero, explicitly set preferredWidth on each LayoutElement to match content width
+            float contentWidth = contentRect.rect.width;
+            if (contentWidth > 0f)
+            {
+                for (int k = 0; k < moveButtonObjects.Count; k++)
+                {
+                    var obj = moveButtonObjects[k];
+                    if (obj == null) continue;
+                    LayoutElement le = obj.GetComponent<LayoutElement>();
+                    if (le != null)
+                    {
+                        float targetW = Mathf.Max(100f, contentWidth - 20f);
+                        le.preferredWidth = targetW;
+                    }
+                }
+
+                // Force rebuild again with explicit widths
+                LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
+                Canvas.ForceUpdateCanvases();
+                for (int j = 0; j < moveButtonObjects.Count; j++)
+                {
+                    var obj = moveButtonObjects[j];
+                    if (obj == null) continue;
+                    RectTransform r = obj.GetComponent<RectTransform>();
+                    Debug.Log($"[MoveChooser] Final button idx={j} name={obj.name} rect.size={r.rect.size} preferredW={(obj.GetComponent<LayoutElement>()!=null?obj.GetComponent<LayoutElement>().preferredWidth:0f)}");
+                }
+
+                DebugUIRaycastAtPointer();
+            }
         }
     }
     
@@ -173,6 +294,8 @@ public class MoveChooserUI : MonoBehaviour
         nameText.fontStyle = FontStyles.Bold;
         nameText.alignment = TextAlignmentOptions.Left;
         nameText.color = canAfford ? goldAccentColor : new Color(0.4f, 0.35f, 0.3f);
+        // Prevent text from blocking pointer events on the button
+        nameText.raycastTarget = false;
         
         // Cost (right side)
         GameObject costObj = new GameObject("Cost");
@@ -203,23 +326,27 @@ public class MoveChooserUI : MonoBehaviour
         costText.fontSize = 18;
         costText.alignment = TextAlignmentOptions.Right;
         costText.color = canAfford ? parchmentColor : new Color(0.4f, 0.35f, 0.3f);
+        // Prevent text from blocking pointer events on the button
+        costText.raycastTarget = false;
     }
     
     /// <summary>
     /// Handles when mouse hovers over a move
     /// </summary>
-    void OnMoveHover(Move move, CharacterResource resource, CharacterResource secondaryResource)
+    public void OnMoveHover(Move move, CharacterResource resource, CharacterResource secondaryResource)
     {
         currentHoveredMove = move;
+        Debug.Log($"[MoveChooser] Hover: {move.moveName}");
         ShowMoveDescription(move, resource, secondaryResource);
     }
     
     /// <summary>
     /// Handles when mouse leaves a move
     /// </summary>
-    void OnMoveUnhover()
+    public void OnMoveUnhover()
     {
         currentHoveredMove = null;
+        Debug.Log("[MoveChooser] Unhover");
         // Keep description visible for last hovered move
     }
     
@@ -376,12 +503,51 @@ public class MoveChooserUI : MonoBehaviour
         if (moveEffectsText != null)
             moveEffectsText.text = "";
     }
+
+    /// <summary>
+    /// Diagnostic: performs a UI GraphicRaycaster raycast at current mouse position and logs hit results
+    /// </summary>
+    void DebugUIRaycastAtPointer()
+    {
+        if (EventSystem.current == null)
+        {
+            Debug.Log("[MoveChooser] DebugUIRaycastAtPointer: No EventSystem.current present");
+            return;
+        }
+
+        Vector2 pointerPos = Input.mousePosition;
+        PointerEventData ped = new PointerEventData(EventSystem.current);
+        ped.position = pointerPos;
+
+        List<RaycastResult> results = new List<RaycastResult>();
+
+        // Try all GraphicRaycasters in scene
+        GraphicRaycaster[] raycasters = FindObjectsOfType<GraphicRaycaster>();
+        if (raycasters == null || raycasters.Length == 0)
+        {
+            Debug.Log("[MoveChooser] DebugUIRaycastAtPointer: No GraphicRaycaster found in scene");
+            return;
+        }
+
+        foreach (var gr in raycasters)
+        {
+            results.Clear();
+            gr.Raycast(ped, results);
+            Debug.Log($"[MoveChooser] Raycast on GraphicRaycaster '{gr.gameObject.name}' found {results.Count} hits at screen {pointerPos}");
+            for (int i = 0; i < results.Count; i++)
+            {
+                var r = results[i];
+                Debug.Log($"[MoveChooser]   Hit[{i}] go={r.gameObject.name} module={r.module} distance={r.distance} index={r.index} world={r.worldPosition}");
+            }
+        }
+    }
     
     /// <summary>
     /// Handles move selection
     /// </summary>
-    void OnMoveClicked(Move move)
+    public void OnMoveClicked(Move move)
     {
+        Debug.Log($"[MoveChooser] Clicked: {move.moveName}");
         if (onMoveSelected != null)
         {
             onMoveSelected(move);

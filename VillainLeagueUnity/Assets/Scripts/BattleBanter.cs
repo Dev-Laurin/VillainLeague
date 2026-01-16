@@ -118,12 +118,14 @@ public class BattleBanter : MonoBehaviour
         // Random chance to trigger
         if (random.NextDouble() > banterChance)
         {
+            Debug.Log("Banter chance not met, skipping banter.");
             yield break;
         }
         
         // Don't trigger if either character is dead
         if (!actor.IsAlive() || !partner.IsAlive())
         {
+            Debug.Log("One of the characters is dead, skipping banter.");
             yield break;
         }
         
@@ -133,6 +135,7 @@ public class BattleBanter : MonoBehaviour
         
         if (!string.IsNullOrEmpty(banterLine))
         {
+            Debug.Log($"Triggering banter: {speakerName} says \"{banterLine}\"");
             yield return StartCoroutine(ShowBanterDialogue(speakerName, banterLine));
         }
     }

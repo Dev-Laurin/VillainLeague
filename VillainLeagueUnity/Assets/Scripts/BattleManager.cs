@@ -49,12 +49,16 @@ public class BattleManager : MonoBehaviour
         // Initialize player squad with 2 characters
         Character bellinor = new Character("Bellinor Chabbeneoux", 120, 18, 6, true);
         bellinor.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Bellinor Chabbeneoux"));
+        // Log Bellinor's loaded moves for debugging
+        LogCharacterMoves(bellinor);
         // Initialize Resolve as a secondary resource for Bellinor (gained when taking damage or protecting allies)
         bellinor.secondaryResource = new CharacterResource("Resolve", 6, 0); // Max 6, no auto-regen (gained through combat)
         playerSquad.Add(bellinor);
         
         Character naice = new Character("Naice Ajimi", 80, 20, 3, true);
         naice.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Naice Ajimi"));
+        // Log Naice's loaded moves for debugging
+        LogCharacterMoves(naice);
         // Initialize Style as a secondary resource for Naice
         naice.secondaryResource = new CharacterResource("Style", 6, 0); // Max 6, no auto-regen (gained through moves)
         playerSquad.Add(naice);
@@ -62,10 +66,14 @@ public class BattleManager : MonoBehaviour
         // Initialize enemy squad with 2 characters
         Character villain1 = new Character("Villain 1", 70, 12, 4, false);
         villain1.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Villain 1"));
+        // Log villain moves for debugging
+        LogCharacterMoves(villain1);
         enemySquad.Add(villain1);
         
         Character villain2 = new Character("Villain 2", 90, 10, 6, false);
         villain2.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Villain 2"));
+        // Log villain moves for debugging
+        LogCharacterMoves(villain2);
         enemySquad.Add(villain2);
         
         // Setup battle objective (default: defeat all enemies)
@@ -91,6 +99,29 @@ public class BattleManager : MonoBehaviour
         
         currentState = BattleState.START;
         StartCoroutine(BattleFlow());
+    }
+
+    // Debug helper: log moves for a character's moveset
+    void LogCharacterMoves(Character character)
+    {
+        if (character == null)
+        {
+            Debug.Log("[Moves] Character is null");
+            return;
+        }
+
+        if (character.moveSet == null || character.moveSet.moves == null)
+        {
+            Debug.Log($"[Moves] {character.characterName} has no moveset loaded.");
+            return;
+        }
+
+        Debug.Log($"[Moves] {character.characterName} moves ({character.moveSet.moves.Count}):");
+        foreach (Move m in character.moveSet.moves)
+        {
+            if (m == null) continue;
+            Debug.Log($"[Move] {character.characterName} - {m.moveName} (id:{m.id}) cost:{m.resourceCost} secCost:{m.secondaryResourceCost} dmg:{m.damage} heal:{m.healing} super:{m.isSuper}");
+        }
     }
 
     IEnumerator BattleFlow()
@@ -325,6 +356,7 @@ public class BattleManager : MonoBehaviour
         }
         
         // Display moves with resource info
+        Debug.Log($"[SelectMove] Displaying moves for {character.characterName}. Moves:{availableMoves.Count} showOnlySupers:{showOnlySupers} moveChooserUI_present:{(battleUI != null && battleUI.moveChooserUI != null)}");
         battleUI.DisplayMoves(availableMoves, character.moveSet.resource, character.secondaryResource, showOnlySupers, (Move move) =>
         {
             selectedMove = move;
@@ -516,10 +548,12 @@ public class BattleManager : MonoBehaviour
         }
         
         // Trigger battle banter (only for player characters)
+        Debug.Log("triggering battle banter?"); 
         if (caster.isPlayerCharacter && battleBanter != null)
         {
             // Get the other player character
             Character partner = null;
+            Debug.Log("looking to see if partner is still alive"); 
             foreach (Character hero in playerSquad)
             {
                 if (hero != caster && hero.IsAlive())
@@ -531,10 +565,12 @@ public class BattleManager : MonoBehaviour
             
             if (partner != null)
             {
+                Debug.Log($"partner found: {partner.characterName}");
                 // Randomly choose context for banter
                 string[] contexts = { "move_comment", "playful_insult", "check_in" };
                 int contextIndex = Random.Range(0, contexts.Length);
                 string context = contexts[contextIndex];
+                Debug.Log($"selected banter context: {context}");
                 
                 yield return StartCoroutine(battleBanter.TryTriggerBanter(caster, partner, context));
             }
