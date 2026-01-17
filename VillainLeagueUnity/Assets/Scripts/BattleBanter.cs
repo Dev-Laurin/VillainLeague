@@ -110,17 +110,21 @@ public class BattleBanter : MonoBehaviour
     
     void LoadCharacterBanter(CharacterBanterData characterData, Dictionary<string, List<BanterLine>> targetDict)
     {
-        if (characterData.move_comment != null && characterData.move_comment.Length > 0)
-            targetDict["move_comment"] = new List<BanterLine>(characterData.move_comment);
-        
-        if (characterData.playful_insult != null && characterData.playful_insult.Length > 0)
-            targetDict["playful_insult"] = new List<BanterLine>(characterData.playful_insult);
-        
-        if (characterData.check_in != null && characterData.check_in.Length > 0)
-            targetDict["check_in"] = new List<BanterLine>(characterData.check_in);
-        
-        if (characterData.low_hp != null && characterData.low_hp.Length > 0)
-            targetDict["low_hp"] = new List<BanterLine>(characterData.low_hp);
+        LoadBanterContext("move_comment", characterData.move_comment, targetDict);
+        LoadBanterContext("playful_insult", characterData.playful_insult, targetDict);
+        LoadBanterContext("check_in", characterData.check_in, targetDict);
+        LoadBanterContext("low_hp", characterData.low_hp, targetDict);
+    }
+    
+    /// <summary>
+    /// Helper method to load a specific banter context into the dictionary
+    /// </summary>
+    void LoadBanterContext(string contextKey, BanterLine[] lines, Dictionary<string, List<BanterLine>> targetDict)
+    {
+        if (lines != null && lines.Length > 0)
+        {
+            targetDict[contextKey] = new List<BanterLine>(lines);
+        }
     }
     
     // JSON data structures for deserialization (Unity JsonUtility compatible)
@@ -224,11 +228,15 @@ public class BattleBanter : MonoBehaviour
         // Load audio file from StreamingAssets/Audio/
         string audioPath = Path.Combine(Application.streamingAssetsPath, "Audio", audioFileName);
         
+        // Determine audio type from file extension
+        AudioType audioType = GetAudioType(audioFileName);
+        
         // Use UnityWebRequest for cross-platform compatibility
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + audioPath, AudioType.WAV))
+        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + audioPath, audioType))
         {
             yield return www.SendWebRequest();
             
+            // Check for various error conditions
             if (www.result == UnityWebRequest.Result.Success)
             {
                 AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
@@ -247,10 +255,32 @@ public class BattleBanter : MonoBehaviour
                     Debug.LogWarning($"Failed to load audio content from: {audioPath}");
                 }
             }
-            else
+            else if (www.result == UnityWebRequest.Result.ConnectionError || 
+                     www.result == UnityWebRequest.Result.ProtocolError ||
+                     www.result == UnityWebRequest.Result.DataProcessingError)
             {
-                Debug.LogWarning($"Audio file not found or failed to load: {audioPath}. Banter will play without audio.");
+                Debug.LogWarning($"Audio file not found or failed to load: {audioPath}. Error: {www.error}. Banter will play without audio.");
             }
+        }
+    }
+    
+    /// <summary>
+    /// Determines the audio type based on file extension
+    /// </summary>
+    AudioType GetAudioType(string fileName)
+    {
+        string extension = Path.GetExtension(fileName).ToLower();
+        switch (extension)
+        {
+            case ".wav":
+                return AudioType.WAV;
+            case ".mp3":
+                return AudioType.MPEG;
+            case ".ogg":
+                return AudioType.OGGVORBIS;
+            default:
+                Debug.LogWarning($"Unknown audio format: {extension}, defaulting to WAV");
+                return AudioType.WAV;
         }
     }
     

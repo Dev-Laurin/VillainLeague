@@ -165,7 +165,7 @@ Edit `Assets/StreamingAssets/BanterConfig.json` to:
 ### Audio Files
 
 - Audio files should be placed in `Assets/StreamingAssets/Audio/`
-- Supported format: WAV (recommended for Unity)
+- Supported formats: WAV, MP3, OGG (automatically detected from file extension)
 - Files are loaded on-demand and cached for performance
 - If an audio file is missing, the text will still display with a warning in the console
 
@@ -210,10 +210,6 @@ To test audio playback:
 3. Play the battle scene and trigger banter
 4. Audio should play simultaneously with text display
 5. Check Console for audio loading messages or warnings
-   - Auto-dismiss after 3 seconds
-   - Be contextually appropriate
-   - Only appear when both heroes are alive
-   - Show the speaking character's name in brackets
 
 ## Future Enhancements
 
