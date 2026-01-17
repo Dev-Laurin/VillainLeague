@@ -1,0 +1,166 @@
+{
+  "bellinor": {
+    "move_comment": [
+      {
+        "text": "Well executed, Naice.",
+        "audioFile": "bellinor_well_executed.wav"
+      },
+      {
+        "text": "That was... surprisingly effective.",
+        "audioFile": "bellinor_surprisingly_effective.wav"
+      },
+      {
+        "text": "Impressive form, though a bit flashy.",
+        "audioFile": "bellinor_impressive_form.wav"
+      },
+      {
+        "text": "Your technique improves daily.",
+        "audioFile": "bellinor_technique_improves.wav"
+      },
+      {
+        "text": "I see you've been practicing.",
+        "audioFile": "bellinor_been_practicing.wav"
+      }
+    ],
+    "playful_insult": [
+      {
+        "text": "Was that supposed to be intimidating?",
+        "audioFile": "bellinor_intimidating.wav"
+      },
+      {
+        "text": "A bit theatrical, don't you think?",
+        "audioFile": "bellinor_theatrical.wav"
+      },
+      {
+        "text": "All style, as usual.",
+        "audioFile": "bellinor_all_style.wav"
+      },
+      {
+        "text": "Subtlety is not your forte.",
+        "audioFile": "bellinor_not_your_forte.wav"
+      },
+      {
+        "text": "Must you make such a show of it?",
+        "audioFile": "bellinor_such_a_show.wav"
+      }
+    ],
+    "check_in": [
+      {
+        "text": "Stay focused, Naice.",
+        "audioFile": "bellinor_stay_focused.wav"
+      },
+      {
+        "text": "Are you holding up alright?",
+        "audioFile": "bellinor_holding_up.wav"
+      },
+      {
+        "text": "Keep your guard up.",
+        "audioFile": "bellinor_guard_up.wav"
+      },
+      {
+        "text": "Don't get reckless now.",
+        "audioFile": "bellinor_dont_get_reckless.wav"
+      },
+      {
+        "text": "Remember your training.",
+        "audioFile": "bellinor_remember_training.wav"
+      }
+    ],
+    "low_hp": [
+      {
+        "text": "Naice, fall back! I'll handle this.",
+        "audioFile": "bellinor_fall_back.wav"
+      },
+      {
+        "text": "You're hurt. Let me take point.",
+        "audioFile": "bellinor_let_me_take_point.wav"
+      },
+      {
+        "text": "Don't push yourself too hard.",
+        "audioFile": "bellinor_dont_push.wav"
+      }
+    ]
+  },
+  "naice": {
+    "move_comment": [
+      {
+        "text": "Now THAT'S how it's done!",
+        "audioFile": "naice_thats_how_its_done.wav"
+      },
+      {
+        "text": "Ooh, nice one Bell!",
+        "audioFile": "naice_nice_one.wav"
+      },
+      {
+        "text": "Didn't know you had that in you!",
+        "audioFile": "naice_didnt_know.wav"
+      },
+      {
+        "text": "Textbook perfect, as always.",
+        "audioFile": "naice_textbook_perfect.wav"
+      },
+      {
+        "text": "That's my partner!",
+        "audioFile": "naice_my_partner.wav"
+      }
+    ],
+    "playful_insult": [
+      {
+        "text": "Bit slow on that one, weren't you?",
+        "audioFile": "naice_bit_slow.wav"
+      },
+      {
+        "text": "Did you even TRY to look cool?",
+        "audioFile": "naice_try_to_look_cool.wav"
+      },
+      {
+        "text": "So serious all the time!",
+        "audioFile": "naice_so_serious.wav"
+      },
+      {
+        "text": "Where's the flair, Bell?",
+        "audioFile": "naice_wheres_the_flair.wav"
+      },
+      {
+        "text": "You call that a special move?",
+        "audioFile": "naice_call_that_special.wav"
+      }
+    ],
+    "check_in": [
+      {
+        "text": "Still with me, Bell?",
+        "audioFile": "naice_still_with_me.wav"
+      },
+      {
+        "text": "You good over there?",
+        "audioFile": "naice_you_good.wav"
+      },
+      {
+        "text": "Don't go getting all heroic on me!",
+        "audioFile": "naice_dont_get_heroic.wav"
+      },
+      {
+        "text": "Keep it together, partner!",
+        "audioFile": "naice_keep_together.wav"
+      },
+      {
+        "text": "We've got this, right?",
+        "audioFile": "naice_got_this.wav"
+      }
+    ],
+    "low_hp": [
+      {
+        "text": "Bell! You're looking rough!",
+        "audioFile": "naice_looking_rough.wav"
+      },
+      {
+        "text": "Hey, don't be a hero now!",
+        "audioFile": "naice_dont_be_hero.wav"
+      },
+      {
+        "text": "Take a breather, I've got this!",
+        "audioFile": "naice_take_breather.wav"
+      }
+    ]
+  }
+}
