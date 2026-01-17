@@ -209,20 +209,10 @@ public class BattleUI : MonoBehaviour
     
     public void DisplayMoves(List<Move> moves, CharacterResource resource, CharacterResource secondaryResource, bool showOnlySupers, System.Action<Move> onMoveSelected)
     {
-        // Debug: log incoming moves and filter state
-        if (moves == null)
-        {
-            Debug.Log("[DisplayMoves] moves is null");
-        }
-        else
-        {
-            string moveNames = string.Join(", ", moves.ConvertAll(m => m != null ? m.moveName : "<null>"));
-            Debug.Log($"[DisplayMoves] incoming moves ({moves.Count}): {moveNames} | showOnlySupers={showOnlySupers}");
-        }
+        // Normal runtime: do not log move lists to avoid console noise
         // Use enhanced move chooser if available
         if (moveChooserUI != null)
         {
-            Debug.Log("[DisplayMoves] Using enhanced MoveChooserUI");
             // If enhanced UI isn't fully wired (e.g., moveButtonParent null), fall back to legacy panel
             if (moveChooserUI.moveButtonParent == null || moveChooserUI.moveChooserPanel == null)
             {

@@ -109,6 +109,7 @@ public class BattleBanter : MonoBehaviour
     /// </summary>
     public IEnumerator TryTriggerBanter(Character actor, Character partner, string context = "move_comment")
     {
+        Debug.Log($"try trigger banter {actor.characterName} -> {partner.characterName} [{context}]");
         // Only trigger banter between the two heroes
         if (actor == null || partner == null || !actor.isPlayerCharacter || !partner.isPlayerCharacter)
         {

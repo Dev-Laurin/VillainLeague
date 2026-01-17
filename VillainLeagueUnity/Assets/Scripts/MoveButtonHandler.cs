@@ -10,7 +10,6 @@ public class MoveButtonHandler : MonoBehaviour, IPointerEnterHandler, IPointerEx
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        Debug.Log($"[MoveButtonHandler] OnPointerEnter - move:{(move!=null?move.moveName:"<null>")} parentUI:{(parentUI!=null)}");
         if (parentUI != null && move != null)
         {
             parentUI.OnMoveHover(move, resource, secondaryResource);
@@ -19,7 +18,6 @@ public class MoveButtonHandler : MonoBehaviour, IPointerEnterHandler, IPointerEx
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        Debug.Log($"[MoveButtonHandler] OnPointerExit - move:{(move!=null?move.moveName:"<null>")} parentUI:{(parentUI!=null)}");
         if (parentUI != null)
         {
             parentUI.OnMoveUnhover();
@@ -28,7 +26,6 @@ public class MoveButtonHandler : MonoBehaviour, IPointerEnterHandler, IPointerEx
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log($"[MoveButtonHandler] OnPointerClick - move:{(move!=null?move.moveName:"<null>")} parentUI:{(parentUI!=null)}");
         if (parentUI != null && move != null)
         {
             parentUI.OnMoveClicked(move);

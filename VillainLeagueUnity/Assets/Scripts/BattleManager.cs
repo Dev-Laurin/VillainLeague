@@ -49,16 +49,12 @@ public class BattleManager : MonoBehaviour
         // Initialize player squad with 2 characters
         Character bellinor = new Character("Bellinor Chabbeneoux", 120, 18, 6, true);
         bellinor.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Bellinor Chabbeneoux"));
-        // Log Bellinor's loaded moves for debugging
-        LogCharacterMoves(bellinor);
         // Initialize Resolve as a secondary resource for Bellinor (gained when taking damage or protecting allies)
         bellinor.secondaryResource = new CharacterResource("Resolve", 6, 0); // Max 6, no auto-regen (gained through combat)
         playerSquad.Add(bellinor);
         
         Character naice = new Character("Naice Ajimi", 80, 20, 3, true);
         naice.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Naice Ajimi"));
-        // Log Naice's loaded moves for debugging
-        LogCharacterMoves(naice);
         // Initialize Style as a secondary resource for Naice
         naice.secondaryResource = new CharacterResource("Style", 6, 0); // Max 6, no auto-regen (gained through moves)
         playerSquad.Add(naice);
@@ -66,14 +62,10 @@ public class BattleManager : MonoBehaviour
         // Initialize enemy squad with 2 characters
         Character villain1 = new Character("Villain 1", 70, 12, 4, false);
         villain1.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Villain 1"));
-        // Log villain moves for debugging
-        LogCharacterMoves(villain1);
         enemySquad.Add(villain1);
         
         Character villain2 = new Character("Villain 2", 90, 10, 6, false);
         villain2.SetMoveSet(MoveSetLoader.LoadMoveSetFromFile("Villain 2"));
-        // Log villain moves for debugging
-        LogCharacterMoves(villain2);
         enemySquad.Add(villain2);
         
         // Setup battle objective (default: defeat all enemies)
@@ -88,7 +80,12 @@ public class BattleManager : MonoBehaviour
         allCharacters.AddRange(enemySquad);
         turnManager.InitializeTurnOrder(allCharacters);
         
-        // Initialize battle banter system
+        // Initialize battle banter system (auto-find if not assigned)
+        if (battleBanter == null)
+        {
+            battleBanter = FindObjectOfType<BattleBanter>();
+        }
+
         if (battleBanter != null)
         {
             battleBanter.Initialize(battleUI);
@@ -101,28 +98,7 @@ public class BattleManager : MonoBehaviour
         StartCoroutine(BattleFlow());
     }
 
-    // Debug helper: log moves for a character's moveset
-    void LogCharacterMoves(Character character)
-    {
-        if (character == null)
-        {
-            Debug.Log("[Moves] Character is null");
-            return;
-        }
-
-        if (character.moveSet == null || character.moveSet.moves == null)
-        {
-            Debug.Log($"[Moves] {character.characterName} has no moveset loaded.");
-            return;
-        }
-
-        Debug.Log($"[Moves] {character.characterName} moves ({character.moveSet.moves.Count}):");
-        foreach (Move m in character.moveSet.moves)
-        {
-            if (m == null) continue;
-            Debug.Log($"[Move] {character.characterName} - {m.moveName} (id:{m.id}) cost:{m.resourceCost} secCost:{m.secondaryResourceCost} dmg:{m.damage} heal:{m.healing} super:{m.isSuper}");
-        }
-    }
+    
 
     IEnumerator BattleFlow()
     {
@@ -270,28 +246,7 @@ public class BattleManager : MonoBehaviour
             // Wait for player to select action
             bool actionSelected = false;
             selectedAction = BattleAction.ATTACK;
-            
-            // Setup button listeners
-            battleUI.attackButton.onClick.RemoveAllListeners();
-            battleUI.attackButton.onClick.AddListener(() => 
-            {
-                selectedAction = BattleAction.ATTACK;
-                actionSelected = true;
-            });
 
-            battleUI.defendButton.onClick.RemoveAllListeners();
-            battleUI.defendButton.onClick.AddListener(() => 
-            {
-                selectedAction = BattleAction.DEFEND;
-                actionSelected = true;
-            });
-
-            battleUI.specialButton.onClick.RemoveAllListeners();
-            battleUI.specialButton.onClick.AddListener(() => 
-            {
-                selectedAction = BattleAction.SPECIAL;
-                actionSelected = true;
-            });
 
             // Wait for action selection
             while (!actionSelected)
@@ -356,7 +311,6 @@ public class BattleManager : MonoBehaviour
         }
         
         // Display moves with resource info
-        Debug.Log($"[SelectMove] Displaying moves for {character.characterName}. Moves:{availableMoves.Count} showOnlySupers:{showOnlySupers} moveChooserUI_present:{(battleUI != null && battleUI.moveChooserUI != null)}");
         battleUI.DisplayMoves(availableMoves, character.moveSet.resource, character.secondaryResource, showOnlySupers, (Move move) =>
         {
             selectedMove = move;
@@ -398,11 +352,17 @@ public class BattleManager : MonoBehaviour
         {
             // Select target based on move type
             List<Character> targetList = move.targetType == MoveTargetType.SingleEnemy ? enemySquad : playerSquad;
+            Debug.LogWarning($"Selecting target for move '{move.moveName}' (targetType={move.targetType})");
             yield return StartCoroutine(SelectTarget(targetList));
             
             if (selectedTarget == null || !selectedTarget.IsAlive())
             {
-                yield break;
+                Debug.LogWarning("selected target is null"); 
+              //  yield break;
+            }
+            else
+            {
+                Debug.Log($"selected target: {selectedTarget.characterName}");
             }
         }
         
@@ -649,6 +609,8 @@ public class BattleManager : MonoBehaviour
     {
         battleUI.ShowMessage("Select target...");
         battleUI.ShowTargetSelection(true);
+
+        
         
         bool targetSelected = false;
         selectedTarget = null;
@@ -661,50 +623,52 @@ public class BattleManager : MonoBehaviour
                 aliveTargets.Add(c);
         }
 
-        if (aliveTargets.Count == 0)
-        {
-            battleUI.ShowTargetSelection(false);
-            yield break;
-        }
+        yield return aliveTargets[0]; 
 
-        // Setup target buttons
-        battleUI.target1Button.onClick.RemoveAllListeners();
-        if (aliveTargets.Count > 0)
-        {
-            battleUI.target1Button.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = aliveTargets[0].characterName;
-            battleUI.target1Button.onClick.AddListener(() => 
-            {
-                selectedTarget = aliveTargets[0];
-                targetSelected = true;
-            });
-            battleUI.target1Button.gameObject.SetActive(true);
-        }
-        else
-        {
-            battleUI.target1Button.gameObject.SetActive(false);
-        }
+    //     if (aliveTargets.Count == 0)
+    //     {
+    //         battleUI.ShowTargetSelection(false);
+    //         yield break;
+    //     }
 
-        battleUI.target2Button.onClick.RemoveAllListeners();
-        if (aliveTargets.Count > 1)
-        {
-            battleUI.target2Button.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = aliveTargets[1].characterName;
-            battleUI.target2Button.onClick.AddListener(() => 
-            {
-                selectedTarget = aliveTargets[1];
-                targetSelected = true;
-            });
-            battleUI.target2Button.gameObject.SetActive(true);
-        }
-        else
-        {
-            battleUI.target2Button.gameObject.SetActive(false);
-        }
+    //     // Setup target buttons
+    //     //battleUI.target1Button.onClick.RemoveAllListeners();
+    //     if (aliveTargets.Count > 0)
+    //     {
+    //         battleUI.target1Button.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = aliveTargets[0].characterName;
+    //         battleUI.target1Button.onClick.AddListener(() => 
+    //         {
+    //             selectedTarget = aliveTargets[0];
+    //             targetSelected = true;
+    //         });
+    //         battleUI.target1Button.gameObject.SetActive(true);
+    //     }
+    //     else
+    //     {
+    //         battleUI.target1Button.gameObject.SetActive(false);
+    //     }
 
-        // Wait for selection
-        while (!targetSelected)
-        {
-            yield return null;
-        }
+    //   //  battleUI.target2Button.onClick.RemoveAllListeners();
+    //     if (aliveTargets.Count > 1)
+    //     {
+    //         battleUI.target2Button.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = aliveTargets[1].characterName;
+    //         battleUI.target2Button.onClick.AddListener(() => 
+    //         {
+    //             selectedTarget = aliveTargets[1];
+    //             targetSelected = true;
+    //         });
+    //         battleUI.target2Button.gameObject.SetActive(true);
+    //     }
+    //     else
+    //     {
+    //         battleUI.target2Button.gameObject.SetActive(false);
+    //     }
+
+    //     // Wait for selection
+    //     while (!targetSelected)
+    //     {
+    //         yield return null;
+    //     }
 
         battleUI.ShowTargetSelection(false);
     }
@@ -740,59 +704,7 @@ public class BattleManager : MonoBehaviour
     IEnumerator SelectSuperOption(Character player, System.Action<bool> onComplete)
     {
         battleUI.ShowMessage("Choose your action...");
-        
-        bool optionSelected = false;
-        bool isTeamSuper = false;
-        selectedAction = BattleAction.ATTACK; // Default to normal action
-        
-        // Show buttons: Normal Turn, Individual Super (if ready), Team Super
-        bool superReady = player.IsSuperReady();
-        battleUI.SetSuperButtonsActive(superReady, true);
-        
-        // Setup normal move button (use attack button as "Normal Turn")
-        battleUI.attackButton.onClick.RemoveAllListeners();
-        battleUI.attackButton.onClick.AddListener(() => 
-        {
-            selectedAction = BattleAction.ATTACK;
-            isTeamSuper = false;
-            optionSelected = true;
-        });
-        battleUI.attackButton.gameObject.SetActive(true);
-        
-        // Setup individual super button (if ready)
-        if (superReady && battleUI.superButton != null)
-        {
-            battleUI.superButton.onClick.RemoveAllListeners();
-            battleUI.superButton.onClick.AddListener(() => 
-            {
-                selectedAction = BattleAction.SPECIAL;
-                isTeamSuper = false;
-                optionSelected = true;
-            });
-        }
-        
-        // Setup team super button
-        if (battleUI.teamSuperButton != null)
-        {
-            battleUI.teamSuperButton.onClick.RemoveAllListeners();
-            battleUI.teamSuperButton.onClick.AddListener(() => 
-            {
-                isTeamSuper = true;
-                optionSelected = true;
-            });
-        }
-        
-        // Wait for selection
-        while (!optionSelected)
-        {
-            yield return null;
-        }
-        
-        // Hide buttons
-        battleUI.attackButton.gameObject.SetActive(false);
-        battleUI.SetSuperButtonsActive(false, false);
-        
-        onComplete(isTeamSuper);
+        yield return true; 
     }
     
     IEnumerator ExecuteTeamSuper()
